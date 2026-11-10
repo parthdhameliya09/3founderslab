@@ -19,8 +19,8 @@ export const navLinks = [
 
 export type SocialLink = { name: string; href: string };
 export const socialLinks: SocialLink[] = [
-  { name: "Instagram", href: "#" },
+  { name: "Instagram", href: "https://www.instagram.com/3founderslab" },
   { name: "LinkedIn", href: "https://www.linkedin.com/company/3founderslab" },
-  { name: "Facebook", href: "#" },
-  { name: "X", href: "#" },
+  { name: "Facebook", href: "https://www.facebook.com/profile.php?id=61596404880251" },
+  { name: "X", href: "https://x.com/3FoundersLab" },
 ];

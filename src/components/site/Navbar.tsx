@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Menu, X, ArrowUpRight } from "lucide-react";
 import { navLinks } from "@/data/site";
@@ -7,13 +7,36 @@ import logo from "@/assets/logo.png";
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    const updateScroll = () => {
+      setScrolled(window.scrollY > 12);
+
+      const winHeight = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+      const totalScroll = docHeight - winHeight;
+
+      if (totalScroll > 0) {
+        const progress = (window.scrollY / totalScroll) * 100;
+        setScrollProgress(Math.min(100, Math.max(0, progress)));
+      } else {
+        setScrollProgress(0);
+      }
+    };
+
+    updateScroll();
+    const timer = setTimeout(updateScroll, 100);
+
+    window.addEventListener("scroll", updateScroll, { passive: true });
+    window.addEventListener("resize", updateScroll);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("scroll", updateScroll);
+      window.removeEventListener("resize", updateScroll);
+    };
+  }, [pathname]);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -25,7 +48,13 @@ export function Navbar() {
         }`}
     >
       <nav className="container-site flex h-16 items-center justify-between md:h-20" aria-label="Main">
-        <img src={logo} alt="3FoundersLab Logo" className="h-8 w-auto object-contain" />
+        <a href="/" target="_self" rel="noopener noreferrer">
+          <img
+            src={logo}
+            alt="3FoundersLab Logo"
+            className="h-8 w-auto object-contain cursor-pointer"
+          />
+        </a>
         <ul className="hidden items-center gap-1 md:flex">
           {navLinks.map((l) => (
             <li key={l.to}>
@@ -70,6 +99,18 @@ export function Navbar() {
         <div className="container-site mt-8">
           <Link to="/contact" onClick={() => setOpen(false)} className="btn btn-blue w-full">Start a Project</Link>
         </div>
+      </div>
+
+      {/* Universal Scroll Progress Indicator */}
+      <div
+        className={`absolute bottom-0 left-0 right-0 h-[2.5px] w-full overflow-hidden pointer-events-none transition-colors duration-300 ${scrolled ? "bg-border/30" : "bg-transparent"
+          }`}
+        aria-hidden="true"
+      >
+        <div
+          className="h-full bg-gradient-to-r from-brand via-brand to-brand-deep transition-all duration-100 ease-out shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+          style={{ width: `${scrollProgress}%` }}
+        />
       </div>
     </header>
   );

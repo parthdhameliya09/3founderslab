@@ -14,7 +14,13 @@ export function Footer() {
     <footer className="border-t bg-surface">
       <div className="container-site grid gap-12 py-16 md:grid-cols-12">
         <div className="md:col-span-4">
-          <img src={logo} alt="3FoundersLab Logo" className="h-8 w-auto object-contain" />
+          <a href="/" target="_self" rel="noopener noreferrer">
+            <img
+              src={logo}
+              alt="3FoundersLab Logo"
+              className="h-8 w-auto object-contain cursor-pointer"
+            />
+          </a>
           <p className="mt-5 max-w-xs text-sm leading-relaxed text-muted-foreground">
             A technology and digital solutions agency helping businesses build, improve and grow online.
           </p>
