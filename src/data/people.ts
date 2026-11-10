@@ -1,3 +1,4 @@
+import parth from "@/assets/parth.jpeg"
 export type Testimonial = { name: string; company: string; role: string; quote: string; photo?: string; placeholder?: boolean; highlight?: string };
 
 export const testimonials: Testimonial[] = [
@@ -11,5 +12,5 @@ export type TeamMember = { name: string; role: string; bio: string; photo?: stri
 export const team: TeamMember[] = [
   { name: "Adarsh Kori", role: "Founder", bio: "Add a short bio, focus areas and back", photo: "./src/assets/adarsh.jpeg", linkedin: "https://linkedin.com/in/example" },
   { name: "Kaushal Kalal", role: "Founder", bio: "Add a short bio, focus areas and back", photo: "./src/assets/kaushal.jpeg", linkedin: "https://linkedin.com/in/example" },
-  { name: "Parth Dhameliya", role: "Founder", bio: "🚀 Curious about tech, passionate about problem-solving & always exploring new ways to turn ideas into reality. 💡", photo: "./src/assets/parth.jpeg", linkedin: "https://in.linkedin.com/in/parthdhameliya" },
+  { name: "Parth Dhameliya", role: "Founder", bio: "🚀 Curious about tech, passionate about problem-solving & always exploring new ways to turn ideas into reality. 💡", photo: parth, linkedin: "https://in.linkedin.com/in/parthdhameliya" },
 ];
