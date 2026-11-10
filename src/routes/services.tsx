@@ -20,11 +20,6 @@ function ServicesPage() {
     <>
       <PageHero eyebrow="Services" title={<>Digital Solutions Designed Around <span className="text-brand">Your Business.</span></>}
         description="From building your first website to transforming your existing digital infrastructure, we provide solutions that help your business move forward.">
-        <nav className="mt-10 flex flex-wrap gap-2" aria-label="Jump to service">
-          {services.map((s) => (
-            <a key={s.slug} href={`#${s.slug}`} className="rounded-full border bg-background px-3.5 py-1.5 text-sm text-muted-foreground transition-colors hover:border-brand hover:text-brand">{s.title}</a>
-          ))}
-        </nav>
       </PageHero>
 
       {services.map((s, idx) => {

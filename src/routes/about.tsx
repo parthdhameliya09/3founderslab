@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Lightbulb, BadgeCheck, Eye, Sparkles, ShieldCheck, RefreshCw, User } from "lucide-react";
+import { Lightbulb, BadgeCheck, Eye, Sparkles, ShieldCheck, RefreshCw, User, Linkedin } from "lucide-react";
 import { team } from "@/data/people";
 import { PageHero, Reveal, SectionHeading, CtaSection } from "@/components/site/ui";
 
@@ -71,10 +71,50 @@ function AboutPage() {
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {team.map((m, i) => (
               <Reveal key={i} delay={i * 80}>
-                <div className="flex aspect-[4/5] items-center justify-center rounded-lg border bg-background">
-                  {m.photo ? <img src={m.photo} alt={m.name} className="h-full w-full rounded-lg object-cover" /> : <User className="h-14 w-14 text-border" strokeWidth={1.2} />}
+                {m.linkedin ? (
+                  <a
+                    href="/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative flex aspect-[4/5] items-center justify-center overflow-hidden rounded-lg border bg-background transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer"
+                    aria-label={`View ${m.name}'s LinkedIn profile`}
+                  >
+                    {m.photo ? (
+                      <img
+                        src={m.photo}
+                        alt={m.name}
+                        className="h-full w-full rounded-lg object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <User className="h-14 w-14 text-border" strokeWidth={1.2} />
+                    )}
+                    <span className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-background/90 text-[#0A66C2] shadow-sm backdrop-blur-xs transition-all duration-300 group-hover:scale-110 group-hover:bg-[#0A66C2] group-hover:text-white">
+                      <Linkedin className="h-4 w-4" />
+                    </span>
+                  </a>
+                ) : (
+                  <div className="flex aspect-[4/5] items-center justify-center rounded-lg border bg-background">
+                    {m.photo ? (
+                      <img src={m.photo} alt={m.name} className="h-full w-full rounded-lg object-cover" />
+                    ) : (
+                      <User className="h-14 w-14 text-border" strokeWidth={1.2} />
+                    )}
+                  </div>
+                )}
+                <div className="mt-5 flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">{m.name}</h3>
+                  {m.linkedin && (
+                    <a
+                      href={m.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground transition-colors hover:text-[#0A66C2]"
+                      aria-label={`${m.name}'s LinkedIn`}
+                    >
+                      <Linkedin className="h-4 w-4" />
+                    </a>
+                  )}
                 </div>
-                <h3 className="mt-5 text-lg font-semibold">{m.name}</h3>
                 <p className="text-sm text-brand">{m.role}</p>
                 <p className="mt-2 text-sm text-muted-foreground">{m.bio}</p>
               </Reveal>

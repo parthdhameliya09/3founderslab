@@ -1,4 +1,7 @@
-import parth from "@/assets/parth.jpeg"
+import parth from "@/assets/parth.jpeg";
+import adarsh from "@/assets/adarsh.jpeg";
+import kaushal from "@/assets/kaushal.jpeg";
+
 export type Testimonial = { name: string; company: string; role: string; quote: string; photo?: string; placeholder?: boolean; highlight?: string };
 
 export const testimonials: Testimonial[] = [
@@ -10,7 +13,7 @@ export const testimonials: Testimonial[] = [
 export type TeamMember = { name: string; role: string; bio: string; photo?: string; linkedin?: string };
 
 export const team: TeamMember[] = [
-  { name: "Adarsh Kori", role: "Founder", bio: "Add a short bio, focus areas and back", photo: "./src/assets/adarsh.jpeg", linkedin: "https://linkedin.com/in/example" },
-  { name: "Kaushal Kalal", role: "Founder", bio: "Add a short bio, focus areas and back", photo: "./src/assets/kaushal.jpeg", linkedin: "https://linkedin.com/in/example" },
-  { name: "Parth Dhameliya", role: "Founder", bio: "🚀 Curious about tech, passionate about problem-solving & always exploring new ways to turn ideas into reality. 💡", photo: {parth}, linkedin: "https://in.linkedin.com/in/parthdhameliya" },
+  { name: "Adarsh Kori", role: "Founder", bio: "🚀 Specializing in WordPress, Shopify & Webflow development, delivering scalable digital experiences, seamless CMS solutions, and growth-driven websites.💡", photo: adarsh, linkedin: "https://www.linkedin.com/in/adarsh-kori-ab4072281" },
+  { name: "Kaushal Kalal", role: "Founder", bio: "🚀 Specializing in Digital Marketing, Meta Ads & MERN Stack development, combining strategic campaigns with scalable web solutions.💡", photo: kaushal, linkedin: "https://www.linkedin.com/in/kaushal-kalal-283490312" },
+  { name: "Parth Dhameliya", role: "Founder", bio: "🚀 Specializing in AI Automation & AI/ML, with a focus on project execution, client management, and practical solutions.💡", photo: parth, linkedin: "https://in.linkedin.com/in/parthdhameliya" },
 ];

@@ -44,8 +44,13 @@ export function Navbar() {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${scrolled || open ? "border-b bg-background/90 backdrop-blur-md" : "border-b border-transparent bg-background"
-        }`}
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        open
+          ? "border-b bg-background"
+          : scrolled
+          ? "border-b bg-background/90 backdrop-blur-md"
+          : "border-b border-transparent bg-background"
+      }`}
     >
       <nav className="container-site flex h-16 items-center justify-between md:h-20" aria-label="Main">
         <a href="/" target="_self" rel="noopener noreferrer">
@@ -83,21 +88,42 @@ export function Navbar() {
         </div>
       </nav>
 
+      {/* Mobile navigation drawer */}
       <div
-        className={`fixed inset-x-0 top-16 bottom-0 bg-background transition-all duration-300 md:hidden ${open ? "visible opacity-100" : "invisible -translate-y-2 opacity-0"
-          }`}
+        className={`fixed inset-x-0 top-16 h-[calc(100dvh-4rem)] bg-background overflow-y-auto transition-all duration-300 md:hidden z-50 ${
+          open ? "visible opacity-100 translate-y-0" : "invisible -translate-y-2 opacity-0 pointer-events-none"
+        }`}
+        style={{ backgroundColor: "var(--background)" }}
       >
-        <ul className="container-site flex flex-col gap-1 pt-6">
-          {[...navLinks, { to: "/contact", label: "Contact" } as const].map((l, i) => (
-            <li key={l.to} style={{ transitionDelay: open ? `${i * 40}ms` : "0ms" }} className={`transition-all duration-300 ${open ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}>
-              <Link to={l.to} onClick={() => setOpen(false)} className="block border-b py-4 text-2xl font-semibold tracking-tight">
-                {l.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <div className="container-site mt-8">
-          <Link to="/contact" onClick={() => setOpen(false)} className="btn btn-blue w-full">Start a Project</Link>
+        <div className="container-site flex flex-col justify-between min-h-full pt-6 pb-12">
+          <ul className="flex flex-col gap-1">
+            {[...navLinks, { to: "/contact", label: "Contact" } as const].map((l, i) => (
+              <li
+                key={l.to}
+                style={{ transitionDelay: open ? `${i * 35}ms` : "0ms" }}
+                className={`transition-all duration-300 ${
+                  open ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+                }`}
+              >
+                <Link
+                  to={l.to}
+                  onClick={() => setOpen(false)}
+                  className="block border-b border-border/70 py-4 text-2xl font-semibold tracking-tight text-foreground transition-colors hover:text-brand"
+                >
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-8">
+            <Link
+              to="/contact"
+              onClick={() => setOpen(false)}
+              className="btn btn-blue w-full shadow-md"
+            >
+              Start a Project
+            </Link>
+          </div>
         </div>
       </div>
 
