@@ -40,7 +40,7 @@ export function PageHero({ eyebrow, title, description, children }: { eyebrow: s
   return (
     <section className="relative overflow-hidden border-b">
       <div className="grid-lines pointer-events-none absolute inset-0 opacity-50 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
-      <div className="container-site relative pt-16 pb-16 md:pt-24 md:pb-24">
+      <div className="container-site relative pt-16 pb-16 md:pt-12 md:pb-12">
         <p className="eyebrow mb-5 page-in">{eyebrow}</p>
         <h1 className="page-in max-w-4xl text-4xl font-bold leading-[1.05] md:text-6xl lg:text-7xl">{title}</h1>
         {description && <p className="page-in mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">{description}</p>}
@@ -134,7 +134,7 @@ export function BlogCard({ post }: { post: Post }) {
 export function TestimonialCard({ t }: { t: Testimonial }) {
   return (
     <figure className="flex h-full flex-col rounded-lg border bg-background p-7">
-      {t.placeholder && <span className="mb-4 w-fit rounded bg-surface px-2 py-0.5 font-mono text-[0.65rem] uppercase tracking-wider text-muted-foreground">Placeholder</span>}
+      {t.highlight && <span className="mb-4 w-fit rounded bg-surface px-2 py-0.5 font-mono text-[0.65rem] uppercase tracking-wider text-muted-foreground">{t.highlight}</span>}
       <Quote className="h-6 w-6 text-brand" strokeWidth={1.6} />
       <blockquote className="mt-4 flex-1 leading-relaxed">{t.quote}</blockquote>
       <figcaption className="mt-6 flex items-center gap-3 border-t pt-5">

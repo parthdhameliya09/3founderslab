@@ -13,7 +13,7 @@ import { HeroVisual } from "@/components/site/HeroVisual";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "3FoundersLab — Building Digital Experiences That Move Businesses Forward" },
+      { title: "3FoundersLab - Building Digital Experiences That Move Businesses Forward" },
       { name: "description", content: "3FoundersLab builds websites, e-commerce, UI/UX, branding, SEO and AI automation for startups, small businesses and growing brands." },
       { property: "og:title", content: "3FoundersLab — Digital Experiences That Move Businesses Forward" },
       { property: "og:description", content: "Websites, design, smart technology and intelligent automation — under one roof." },

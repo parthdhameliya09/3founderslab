@@ -87,8 +87,8 @@
 }
 
 @utility section-y {
-  padding-block: 5rem;
-  @media (min-width: 768px) { padding-block: 7.5rem; }
+  padding-block: 3rem;
+  @media (min-width: 768px) { padding-block: 3rem; }
 }
 
 @utility eyebrow {

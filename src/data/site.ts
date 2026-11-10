@@ -18,12 +18,9 @@ export const navLinks = [
 ] as const;
 
 export type SocialLink = { name: string; href: string };
-// Placeholder URLs — replace with real profiles.
 export const socialLinks: SocialLink[] = [
   { name: "Instagram", href: "#" },
-  { name: "LinkedIn", href: "#" },
+  { name: "LinkedIn", href: "https://www.linkedin.com/company/3founderslab" },
   { name: "Facebook", href: "#" },
-  { name: "X / Twitter", href: "#" },
-  { name: "GitHub", href: "#" },
-  { name: "Dribbble", href: "#" },
+  { name: "X", href: "#" },
 ];

@@ -67,7 +67,7 @@ function AboutPage() {
 
       <section className="section-y bg-surface">
         <div className="container-site">
-          <SectionHeading eyebrow="Team" title="The people behind the lab." description="Founder and team profiles will appear here." />
+          <SectionHeading eyebrow="Team" title="The people behind the lab." />
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {team.map((m, i) => (
               <Reveal key={i} delay={i * 80}>
