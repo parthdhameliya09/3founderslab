@@ -80,20 +80,18 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
-    // Replace these placeholders with the app's name and description when first building the app.
-    // Each content route, / included, must still set its own head(). Never add og:image or
-    // twitter:image here: every page without its own would inherit the root's preview image.
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "3FoundersLab — Digital Experiences That Help Businesses Grow" },
+      { title: "3FoundersLab - Beyond technology, into possibilities" },
       { name: "description", content: "Websites, UI/UX, branding, e-commerce, SEO and AI automation for startups and growing businesses." },
       { name: "author", content: "3FoundersLab" },
-      { property: "og:title", content: "3FoundersLab — Digital Experiences That Help Businesses Grow" },
+      { property: "og:title", content: "3FoundersLab - Beyond technology, into possibilities" },
       { property: "og:description", content: "Websites, UI/UX, branding, e-commerce, SEO and AI automation for startups and growing businesses." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    scripts: [{ children: "document.documentElement.classList.add('js')" }],
     links: [
       {
         rel: "stylesheet",
@@ -113,7 +111,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

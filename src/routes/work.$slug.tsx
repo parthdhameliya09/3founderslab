@@ -37,21 +37,21 @@ function ProjectPage() {
   const next = projects[(i + 1) % projects.length];
 
   const sections: [string, string][] = [
-    ["Project overview", p.overview], ["The client", p.clientIntro], ["The challenge", p.challenge], ["Our solution", p.solution],
+    ["Project overview", p.overview], ["The challenge", p.challenge], ["Our solution", p.solution],
   ];
 
   return (
     <>
       <section className="container-site pt-12 md:pt-20">
         <Link to="/work" className="link-arrow text-muted-foreground"><ArrowLeft className="h-4 w-4" /> All work</Link>
-        <p className="eyebrow mt-10">{p.category} · Sample project</p>
+        <p className="eyebrow mt-10">{p.category}</p>
         <h1 className="mt-4 max-w-4xl text-4xl font-bold leading-[1.05] md:text-6xl">{p.name}</h1>
         <p className="mt-6 max-w-2xl text-lg text-muted-foreground">{p.summary}</p>
-        <dl className="mt-10 grid gap-6 border-y py-6 text-sm sm:grid-cols-4">
-          <div><dt className="text-muted-foreground">Client</dt><dd className="mt-1 font-medium">{p.client}</dd></div>
+        <dl className="mt-10 flex flex-col gap-6 border-y py-6 text-sm sm:flex-row sm:items-start sm:justify-between">
+          {/* <div><dt className="text-muted-foreground">Client</dt><dd className="mt-1 font-medium">{p.client}</dd></div> */}
           <div><dt className="text-muted-foreground">Industry</dt><dd className="mt-1 font-medium">{p.industry}</dd></div>
-          <div><dt className="text-muted-foreground">Services</dt><dd className="mt-1 font-medium">{p.services.join(", ")}</dd></div>
-          <div><dt className="text-muted-foreground">Live project</dt><dd className="mt-1 font-medium">
+          <div className="sm:max-w-sm sm:text-center"><dt className="text-muted-foreground">Services</dt><dd className="mt-1 font-medium">{p.services.join(", ")}</dd></div>
+          <div className="sm:text-right"><dt className="text-muted-foreground">Live project</dt><dd className="mt-1 font-medium">
             {p.liveUrl ? <a href={p.liveUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-brand">Visit site <ArrowUpRight className="h-3.5 w-3.5" /></a> : "Link coming soon"}
           </dd></div>
         </dl>

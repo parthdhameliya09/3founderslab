@@ -78,7 +78,7 @@ export function ProjectCard({ project, large = false }: { project: Project; larg
       </div>
       <div className="mt-5 flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs text-muted-foreground">{project.client} · {project.industry} · <span className="text-brand">{project.category}</span></p>
+          <p className="text-xs text-muted-foreground">{project.industry} · <span className="text-brand">{project.category}</span></p>
           <h3 className="mt-1.5 text-xl font-semibold">{project.name}</h3>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{project.summary}</p>
           <div className="mt-3 flex flex-wrap gap-1.5">
@@ -126,7 +126,7 @@ export function BlogCard({ post }: { post: Post }) {
       </div>
       <h3 className="mt-2 text-xl font-semibold leading-snug transition-colors group-hover:text-brand">{post.title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{post.excerpt}</p>
-      <span className="link-arrow mt-4">Read Article <ArrowRight className="h-4 w-4" /></span>
+      <span className="link-arrow mt-4">Read Blog <ArrowRight className="h-4 w-4" /></span>
     </Link>
   );
 }
@@ -157,15 +157,40 @@ export function CtaSection({
   return (
     <section className="pt-12 pb-12">
       <div className="container-site">
-        <Reveal className="relative overflow-hidden rounded-2xl bg-brand-soft px-6 py-16 md:px-16 md:py-24">
-          <div className="grid-lines pointer-events-none absolute inset-0 opacity-60 [mask-image:radial-gradient(ellipse_at_right,black,transparent_70%)]" />
+        <Reveal className="relative overflow-hidden rounded-2xl bg-[#0f0f10] px-6 py-16 text-primary-foreground md:px-16 md:py-24">
+          {/* background glow and grid */}
+          <div className="pointer-events-none absolute -top-32 -right-24 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-40 left-1/3 h-80 w-80 rounded-full bg-white/5 blur-3xl" />
+          <div className="grid-lines pointer-events-none absolute inset-0 opacity-[0.07] [mask-image:radial-gradient(ellipse_at_right,black,transparent_70%)]" />
+          {/* project brief card */}
+          <div className="pointer-events-none absolute top-1/2 right-14 hidden w-80 -translate-y-1/2 lg:block" aria-hidden>
+            <div className="rounded-xl border border-white/10 bg-white/[0.06] p-5 shadow-2xl backdrop-blur-md">
+              <div className="flex items-center justify-between">
+                <div className="flex gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-white/20" /><span className="h-2.5 w-2.5 rounded-full bg-white/20" /><span className="h-2.5 w-2.5 rounded-full bg-white/70" /></div>
+                <span className="font-mono text-[0.65rem] uppercase tracking-widest text-white/50">New project</span>
+              </div>
+              <div className="mt-5 space-y-2.5">
+                <div className="h-2.5 w-3/4 rounded bg-white/70" />
+                <div className="h-2 w-full rounded bg-white/15" />
+                <div className="h-2 w-5/6 rounded bg-white/15" />
+              </div>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {["Website", "Branding", "AI"].map((t) => <span key={t} className="rounded-full border border-white/15 px-2.5 py-1 text-[0.7rem] text-white/70">{t}</span>)}
+              </div>
+              <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-white/10"><div className="h-full w-2/3 rounded-full bg-white" /></div>
+            </div>
+            <div className="animate-float absolute -bottom-5 -left-10 flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-xs font-semibold text-foreground shadow-xl">
+              <span className="h-2 w-2 rounded-full bg-green-500" /> We reply within 24h
+            </div>
+          </div>
           <div className="relative max-w-2xl">
-            <p className="eyebrow mb-4">Let's work together</p>
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 font-mono text-xs uppercase tracking-widest text-white/80">
+              <span className="h-1.5 w-1.5 rounded-full bg-white" /> Let's work together
+            </p>
             <h2 className="text-3xl font-bold leading-[1.1] md:text-5xl">{title}</h2>
-            <p className="mt-5 text-lg text-muted-foreground">{description}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/contact" className="btn btn-blue">Start a Project <ArrowRight className="h-4 w-4" /></Link>
-              <Link to="/contact" className="btn btn-outline">Contact Us</Link>
+            <p className="mt-5 text-lg text-white/75">{description}</p>
+            <div className="mt-8">
+              <Link to="/contact" className="btn bg-white text-foreground hover:bg-white/85">Start a Project <ArrowRight className="h-4 w-4" /></Link>
             </div>
           </div>
         </Reveal>

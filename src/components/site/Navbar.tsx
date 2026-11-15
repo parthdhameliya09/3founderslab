@@ -44,19 +44,19 @@ export function Navbar() {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        open
+      className={`sticky top-0 z-50 transition-all duration-300 ${open
           ? "border-b bg-background"
           : scrolled
-          ? "border-b bg-background/90 backdrop-blur-md"
-          : "border-b border-transparent bg-background"
-      }`}
+            ? "border-b bg-background/90 backdrop-blur-md"
+            : "border-b border-transparent bg-background"
+        }`}
     >
       <nav className="container-site flex h-16 items-center justify-between md:h-20" aria-label="Main">
         <a href="/" target="_self" rel="noopener noreferrer">
           <img
             src={logo}
             alt="3FoundersLab Logo"
+            fetchPriority="high"
             className="h-8 w-auto object-contain cursor-pointer"
           />
         </a>
@@ -90,9 +90,8 @@ export function Navbar() {
 
       {/* Mobile navigation drawer */}
       <div
-        className={`fixed inset-x-0 top-16 h-[calc(100dvh-4rem)] bg-background overflow-y-auto transition-all duration-300 md:hidden z-50 ${
-          open ? "visible opacity-100 translate-y-0" : "invisible -translate-y-2 opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-x-0 top-16 h-[calc(100dvh-4rem)] bg-background overflow-y-auto transition-all duration-300 md:hidden z-50 ${open ? "visible opacity-100 translate-y-0" : "invisible -translate-y-2 opacity-0 pointer-events-none"
+          }`}
         style={{ backgroundColor: "var(--background)" }}
       >
         <div className="container-site flex flex-col justify-between min-h-full pt-6 pb-12">
@@ -101,9 +100,8 @@ export function Navbar() {
               <li
                 key={l.to}
                 style={{ transitionDelay: open ? `${i * 35}ms` : "0ms" }}
-                className={`transition-all duration-300 ${
-                  open ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
-                }`}
+                className={`transition-all duration-300 ${open ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+                  }`}
               >
                 <Link
                   to={l.to}

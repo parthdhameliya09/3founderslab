@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { siteConfig, socialLinks } from "@/data/site";
@@ -9,7 +10,19 @@ const quick = [
 ] as const;
 const serviceLinks = ["Website Development", "E-commerce", "UI/UX Design", "Branding", "AI Automation", "Digital Marketing", "SEO"];
 
+function getISTYear(): number {
+  return Number(new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Kolkata", year: "numeric" }).format(new Date()));
+}
+
 export function Footer() {
+  const [year, setYear] = useState(getISTYear);
+  useEffect(() => {
+    setYear(getISTYear());
+    // Re-check hourly so a tab left open across New Year (IST) updates itself.
+    const id = setInterval(() => setYear(getISTYear()), 60 * 60 * 1000);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <footer className="border-t bg-surface">
       <div className="container-site grid gap-12 py-16 md:grid-cols-12">
@@ -42,7 +55,7 @@ export function Footer() {
       </div>
       <div className="border-t">
         <div className="container-site flex flex-col gap-3 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© 2026 3FoundersLab. All Rights Reserved.</p>
+          <p suppressHydrationWarning>© {year} 3FoundersLab. All Rights Reserved.</p>
           <div className="flex gap-5">
             <Link to="/privacy" className="hover:text-foreground">Privacy Policy</Link>
             <Link to="/terms" className="hover:text-foreground">Terms & Conditions</Link>

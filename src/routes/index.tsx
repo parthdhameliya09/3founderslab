@@ -23,12 +23,12 @@ export const Route = createFileRoute("/")({
 });
 
 const why = [
-  ["Complete Digital Solutions", "Everything from branding and design to development and digital growth."],
-  ["Business-First Approach", "We understand your business goals before suggesting technical solutions."],
-  ["Modern Technology", "We use reliable, scalable and modern technologies."],
+  ["Complete Digital Solutions", "Branding, design, development and growth, all at one place."],
+  ["Business First Approach", "We understand your business goals before suggesting technical solutions."],
+  ["Modern Technology", "The right tech stack for your business, not just the trendy one."],
   ["Clean & Functional Design", "Beautiful websites that are easy to use and built with purpose."],
   ["Transparent Communication", "Clear discussions, honest timelines and regular updates."],
-  ["Long-Term Partnership", "We help maintain, improve and grow your digital presence."],
+  ["Long-Term Partnership", "We stay with you after launch."],
 ];
 
 const processSteps = [
@@ -55,8 +55,11 @@ function Home() {
             <h1 className="page-in mt-7 text-[2.6rem] font-extrabold leading-[1.02] sm:text-6xl lg:text-[4.6rem]">
               Building <span className="text-brand">Digital Experiences</span> That Move Businesses <span className="text-brand-deep">Forward.</span>
             </h1>
-            <p className="page-in mt-7 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              We help businesses grow through powerful websites, thoughtful design, smart technology & intelligent automation. From your first digital presence to your next big transformation, we're here to build it.
+            <p className="page-in mt-6 font-mono text-sm font-medium uppercase tracking-[0.18em] text-brand">
+              Beyond Technology, Into Possibilities
+            </p>
+            <p className="page-in mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">
+              We help businesses grow with websites, design, technology and automation. From your first digital presence to your next big transformation, we're here to build it.
             </p>
             <div className="page-in mt-9 flex flex-wrap gap-3">
               <Link to="/contact" className="btn btn-blue">Start a Project <ArrowRight className="h-4 w-4" /></Link>
@@ -106,7 +109,7 @@ function Home() {
       <section className="pt-12 pb-12 bg-surface">
         <div className="container-site grid gap-12 lg:grid-cols-12">
           <Reveal className="lg:col-span-5">
-            <div className="lg:sticky lg:top-32">
+            <div>
               <p className="eyebrow mb-4">Why 3FoundersLab</p>
               <h2 className="text-3xl font-bold leading-[1.1] md:text-5xl">Good Technology. Thoughtful Design. <span className="text-brand">Meaningful Results.</span></h2>
             </div>
@@ -128,8 +131,8 @@ function Home() {
       {/* Work */}
       <section className="pt-12 pb-12">
         <div className="container-site">
-          <SectionHeading eyebrow="Selected work" title="Some Things We've Built."
-            description="Explore selected projects where design, technology, and business goals come together. (Sample projects shown — real case studies coming soon.)" />
+          <SectionHeading eyebrow="Our work" title="Some Things We've Built."
+            description="Ideas turned into real products. Take a look at what we've created." />
           <div className="mb-10 flex flex-wrap gap-2" role="tablist" aria-label="Filter projects">
             {projectCategories.map((c) => (
               <button key={c} role="tab" aria-selected={cat === c} onClick={() => setCat(c)}
@@ -153,11 +156,16 @@ function Home() {
             <p className="eyebrow mb-4">How we work</p>
             <h2 className="text-3xl font-bold leading-[1.1] md:text-5xl">Simple Process. Clear Communication. Better Results.</h2>
           </Reveal>
-          <ol className="grid gap-10 md:grid-cols-4 md:gap-6">
+          <ol className="relative grid gap-10 pl-8 md:grid-cols-4 md:gap-6 md:pl-0">
+            {/* One continuous progress line: vertical on mobile, horizontal on desktop */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute top-0 bottom-0 left-[4px] w-px bg-background/20 md:inset-x-0 md:bottom-auto md:left-0 md:h-px md:w-auto"
+            />
             {processSteps.map(([n, t, d], i) => (
               <Reveal key={n} delay={i * 100}>
-                <li className="relative border-t border-background/20 pt-6">
-                  <span className="absolute -top-[5px] left-0 h-[9px] w-[9px] rounded-full bg-brand" />
+                <li className="relative md:pt-6">
+                  <span className="absolute top-[6px] -left-8 h-[9px] w-[9px] rounded-full bg-brand md:-top-[4px] md:left-0" />
                   <span className="font-mono text-sm text-background/50">{n}</span>
                   <h3 className="mt-3 text-xl font-semibold">{t}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-background/60">{d}</p>
@@ -172,8 +180,17 @@ function Home() {
       <section className="pt-12 pb-12 bg-surface">
         <div className="container-site">
           <SectionHeading eyebrow="Testimonials" title="What Our Clients Say." />
-          <div className="grid gap-6 md:grid-cols-3">
-            {testimonials.map((t, i) => <Reveal key={i} delay={i * 80} className="h-full"><TestimonialCard t={t} /></Reveal>)}
+        </div>
+        {/* Auto-scrolling testimonials; second copy is hidden from assistive tech, pauses on hover */}
+        <div className="testimonial-marquee relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
+          <div className="animate-marquee-slow flex w-max">
+            {[0, 1].map((copy) => (
+              <div key={copy} className="flex gap-6 pr-6" aria-hidden={copy === 1 ? true : undefined}>
+                {testimonials.map((t, i) => (
+                  <div key={i} className="w-[85vw] max-w-sm shrink-0 sm:w-[24rem]"><TestimonialCard t={t} /></div>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -181,8 +198,8 @@ function Home() {
       {/* Blogs */}
       <section className="pt-12 pb-12">
         <div className="container-site">
-          <SectionHeading eyebrow="Insights" title="Thoughts, Ideas & Digital Insights."
-            action={<Link to="/blogs" className="btn btn-outline shrink-0">Explore All Articles</Link>} />
+          <SectionHeading eyebrow="Blogs" title="Thoughts, Ideas & Digital Insights."
+            action={<Link to="/blogs" className="btn btn-outline shrink-0">Explore All Blogs</Link>} />
           <div className="grid gap-10 md:grid-cols-3">
             {posts.slice(0, 3).map((p, i) => <Reveal key={p.slug} delay={i * 80}><BlogCard post={p} /></Reveal>)}
           </div>
