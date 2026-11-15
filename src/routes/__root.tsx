@@ -83,10 +83,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "3FoundersLab — Digital Experiences That Help Businesses Grow" },
+      { title: "3FoundersLab - Beyond technology, into possibilities" },
       { name: "description", content: "Websites, UI/UX, branding, e-commerce, SEO and AI automation for startups and growing businesses." },
       { name: "author", content: "3FoundersLab" },
-      { property: "og:title", content: "3FoundersLab — Digital Experiences That Help Businesses Grow" },
+      { property: "og:title", content: "3FoundersLab - Beyond technology, into possibilities" },
       { property: "og:description", content: "Websites, UI/UX, branding, e-commerce, SEO and AI automation for startups and growing businesses." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
