@@ -1,6 +1,69 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
+import emailjs from '@emailjs/browser'
+
+// Google reCAPTCHA v2 ("I'm not a robot"). The site key is public; the secret key lives only in EmailJS.
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY as string | undefined
+
+type Grecaptcha = {
+  ready: (cb: () => void) => void
+  render: (el: HTMLElement, opts: { sitekey: string; callback?: (token: string) => void; 'expired-callback'?: () => void }) => number
+  getResponse: (id?: number) => string
+  reset: (id?: number) => void
+}
+declare global {
+  interface Window { grecaptcha?: Grecaptcha }
+}
+
+/** Loads the reCAPTCHA script once and renders the checkbox into the returned ref. */
+function useRecaptcha(siteKey: string | undefined) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const widgetId = useRef<number | null>(null)
+  const [token, setToken] = useState('')
+
+  useEffect(() => {
+    if (!siteKey || !containerRef.current) return
+    const render = () => {
+      const g = window.grecaptcha
+      if (!g || !containerRef.current || widgetId.current !== null) return
+      g.ready(() => {
+        if (!containerRef.current || widgetId.current !== null) return
+        widgetId.current = g.render(containerRef.current, {
+          sitekey: siteKey,
+          callback: setToken,
+          'expired-callback': () => setToken(''),
+        })
+      })
+    }
+    if (window.grecaptcha) { render(); return }
+    const existing = document.querySelector<HTMLScriptElement>('script[data-recaptcha]')
+    const script = existing ?? document.createElement('script')
+    if (!existing) {
+      script.src = 'https://www.google.com/recaptcha/api.js?render=explicit'
+      script.async = true
+      script.defer = true
+      script.dataset.recaptcha = 'true'
+      document.head.appendChild(script)
+    }
+    script.addEventListener('load', render)
+    return () => script.removeEventListener('load', render)
+  }, [siteKey])
+
+  const reset = () => {
+    if (widgetId.current !== null) window.grecaptcha?.reset(widgetId.current)
+    setToken('')
+  }
+
+  return { containerRef, token, reset }
+}
+
+// EmailJS IDs come from env vars (see .env.example). They are public by design.
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID as string | undefined
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID as string | undefined
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY as string | undefined
+
+type Status = 'idle' | 'sending' | 'success' | 'error'
 
 export const Route = createFileRoute('/contact')({
   component: ContactPage,
@@ -48,7 +111,9 @@ function ContactPage() {
     'Website Development',
     'E-commerce',
   ])
-  const [submitted, setSubmitted] = useState(false)
+  const [status, setStatus] = useState<Status>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
+  const captcha = useRecaptcha(RECAPTCHA_SITE_KEY)
 
   function toggleService(service: string) {
     setSelectedServices((current) =>
@@ -58,9 +123,83 @@ function ContactPage() {
     )
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setSubmitted(true)
+    if (status === 'sending') return
+
+    const form = event.currentTarget
+    const data = new FormData(form)
+    const field = (key: string) => String(data.get(key) ?? '').trim()
+
+    // Honeypot: real users never see or fill this field; bots usually do.
+    if (field('website')) {
+      setStatus('success')
+      form.reset()
+      return
+    }
+
+    if (selectedServices.length === 0) {
+      setStatus('error')
+      setErrorMessage('Please select at least one service.')
+      return
+    }
+
+    if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
+      console.error('EmailJS is not configured. Set the VITE_EMAILJS_* environment variables.')
+      setStatus('error')
+      setErrorMessage('The form is temporarily unavailable. Please email us at hello@3founderslab.com.')
+      return
+    }
+
+    if (RECAPTCHA_SITE_KEY && !captcha.token) {
+      setStatus('error')
+      setErrorMessage('Please tick "I\'m not a robot" before sending.')
+      return
+    }
+
+    setStatus('sending')
+    setErrorMessage('')
+
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          name: field('name'),
+          company: field('company') || '—',
+          email: field('email'),
+          phone: field('phone') || '—',
+          services: selectedServices.join(', '),
+          budget: field('budget') || 'Not specified',
+          preferredContact: field('preferredContact') || 'Email',
+          description: field('description'),
+          submittedAt: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) + ' IST',
+          // EmailJS verifies this token server-side when reCAPTCHA is enabled on the template.
+          'g-recaptcha-response': captcha.token,
+        },
+        {
+          publicKey: EMAILJS_PUBLIC_KEY,
+          // Ignore requests from headless browsers (common for bots).
+          blockHeadless: true,
+          // Allow at most one send every 30 seconds from this browser.
+          limitRate: { id: 'contact-form', throttle: 30_000 },
+        },
+      )
+      setStatus('success')
+      form.reset()
+      captcha.reset()
+    } catch (err) {
+      // A token can only be used once, so always ask for a fresh tick after a failed attempt.
+      captcha.reset()
+      console.error('EmailJS send failed', err)
+      setStatus('error')
+      const code = (err as { status?: number })?.status
+      setErrorMessage(
+        code === 429
+          ? 'You just sent an enquiry. Please wait 30 seconds before sending another.'
+          : 'Something went wrong while sending. Please try again or email us at hello@3founderslab.com.',
+      )
+    }
   }
 
   return (
@@ -76,17 +215,17 @@ function ContactPage() {
           </p>
 
           <div className="mt-7 space-y-3">
-            <a href="mailto:hello@3founderslab.com" className="flex min-h-[74px] items-center gap-4 rounded-xl border border-[#e0e6ef] px-[18px] py-4 transition-colors hover:border-[#2563eb]">
+            <a href="mailto:3founderslab@gmail.com" className="flex min-h-[74px] items-center gap-4 rounded-xl border border-[#e0e6ef] px-[18px] py-4 transition-colors hover:border-[#2563eb]">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#eff4ff] text-[#1749bd]"><MailIcon /></span>
               <span>
-                <span className="block text-[13px] font-bold">hello@3founderslab.com</span>
+                <span className="block text-[13px] font-bold">3founderslab@gmail.com</span>
                 <span className="block text-[11px] text-[#4b5563]">Email us anytime</span>
               </span>
             </a>
-            <a href="tel:+919876543210" className="flex min-h-[74px] items-center gap-4 rounded-xl border border-[#e0e6ef] px-[18px] py-4 transition-colors hover:border-[#2563eb]">
+            <a href="tel:+917698209890" className="flex min-h-[74px] items-center gap-4 rounded-xl border border-[#e0e6ef] px-[18px] py-4 transition-colors hover:border-[#2563eb]">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#eff4ff] text-[#1749bd]"><PhoneIcon /></span>
               <span>
-                <span className="block text-[13px] font-bold">+91 98765 43210</span>
+                <span className="block text-[13px] font-bold">+91 76982 09890</span>
                 <span className="block text-[11px] text-[#4b5563]">Mon–Sat, 10am–7pm IST</span>
               </span>
             </a>
@@ -94,7 +233,7 @@ function ContactPage() {
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#eff4ff] text-[#1749bd]"><PinIcon /></span>
               <span>
                 <span className="block text-[13px] font-bold">Ahmedabad, Gujarat, India</span>
-                <span className="block text-[11px] text-[#4b5563]">Available worldwide, remote-first</span>
+                <span className="block text-[11px] text-[#4b5563]">Available worldwide</span>
               </span>
             </div>
           </div>
@@ -102,7 +241,7 @@ function ContactPage() {
           <div className="mt-5 rounded-xl bg-[#f3f4f6] px-[21px] py-[21px]">
             <p className="text-[13px] font-bold">Prefer a quick call?</p>
             <p className="mt-2 text-[13px] text-[#374151]">Book a free 20-min discovery call.</p>
-            <a href="mailto:hello@3founderslab.com?subject=Book%20a%20discovery%20call" className="mt-4 inline-flex h-9 items-center rounded-lg bg-[#080808] px-[18px] text-[12px] font-semibold text-white transition-colors hover:bg-[#2563eb]">
+            <a href="mailto:3founderslab@gmail.com?subject=Book%20a%20discovery%20call" className="mt-4 inline-flex h-9 items-center rounded-lg bg-[#080808] px-[18px] text-[12px] font-semibold text-white transition-colors hover:bg-[#2563eb]">
               Schedule Call <span className="ml-1">→</span>
             </a>
           </div>
@@ -167,11 +306,33 @@ function ContactPage() {
               <textarea required name="description" placeholder="Tell us about your goals, timeline and anything else helpful..." className="mt-2 min-h-[100px] w-full resize-y rounded-lg border border-[#e0e6ef] bg-[#f3f4f6] px-[15px] py-[12px] text-[12px] font-normal leading-5 text-[#111827] outline-none placeholder:text-[#64748b] focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/10" />
             </label>
 
-            <button type="submit" className="mt-5 flex h-[44px] w-full items-center justify-center rounded-lg bg-[#2864e8] text-[12px] font-semibold text-white transition-colors hover:bg-[#1d4ed8]">
-              Send Enquiry <span className="ml-1">→</span>
+            {/* Honeypot field: hidden from people and screen readers, catches bots */}
+            <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+              <label>Website<input type="text" name="website" tabIndex={-1} autoComplete="off" /></label>
+            </div>
+
+            {RECAPTCHA_SITE_KEY && <div ref={captcha.containerRef} className="mt-5 min-h-[78px]" />}
+
+            <button
+              type="submit"
+              disabled={status === 'sending'}
+              className="mt-5 flex h-[44px] w-full items-center justify-center rounded-lg bg-[#2864e8] text-[12px] font-semibold text-white transition-colors hover:bg-[#1d4ed8] disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {status === 'sending' ? 'Sending…' : <>Send Enquiry <span className="ml-1">→</span></>}
             </button>
-            {submitted && <p role="status" className="mt-3 text-center text-[12px] text-[#2563eb]">Thanks for your interest! The form is ready for backend integration.</p>}
-            <p className="mt-[9px] text-center text-[10px] text-[#4b5563]">By submitting, you agree to our Privacy Policy. Ready for backend integration.</p>
+            <div aria-live="polite">
+              {status === 'success' && (
+                <p role="status" className="mt-3 rounded-lg bg-green-50 px-3 py-2 text-center text-[12px] text-green-700">
+                  Thanks! Your enquiry has been sent. We'll get back to you within 24 hours.
+                </p>
+              )}
+              {status === 'error' && (
+                <p role="alert" className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-center text-[12px] text-red-700">
+                  {errorMessage}
+                </p>
+              )}
+            </div>
+            <p className="mt-[9px] text-center text-[10px] text-[#4b5563]">By submitting, you agree to our Privacy Policy.</p>
           </form>
         </section>
       </div>

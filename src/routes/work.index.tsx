@@ -21,7 +21,7 @@ function WorkPage() {
   return (
     <>
       <PageHero eyebrow="Work" title={<>Some Things <span className="text-brand">We've Built.</span></>}
-        description="Explore selected projects where design, technology, and business goals come together. The projects below are clearly marked samples until real case studies are published." />
+        description="Ideas turned into real products. Take a look at what we've created." />
       <section className="section-y !pt-14">
         <div className="container-site">
           <div className="mb-12 flex flex-wrap gap-2" role="tablist" aria-label="Filter projects">

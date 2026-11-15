@@ -62,7 +62,7 @@ function PrivacyPage() {
         </div>
         <section className="mt-10 rounded-xl border border-[#e0e6ef] bg-[#f8fafc] p-6">
           <h2 className="text-lg font-bold">10. Contact us</h2>
-          <p className="mt-3 text-[14px] leading-7 text-[#4b5563]">For questions or privacy-related requests, contact us at <a href="mailto:hello@3founderslab.com" className="font-semibold text-[#2563eb] hover:underline">hello@3founderslab.com</a>.</p>
+          <p className="mt-3 text-[14px] leading-7 text-[#4b5563]">For questions or privacy-related requests, contact us at <a href="mailto:3founderslab@gmail.com" className="font-semibold text-[#2563eb] hover:underline">3founderslab@gmail.com</a>.</p>
           <p className="mt-2 text-[13px] text-[#64748b]">3FoundersLab · Ahmedabad, Gujarat, India</p>
         </section>
         <div className="mt-12 border-t border-[#e5e7eb] pt-6 text-[12px] text-[#64748b]">

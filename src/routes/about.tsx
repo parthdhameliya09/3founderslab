@@ -17,9 +17,9 @@ export const Route = createFileRoute("/about")({
 
 const story = [
   ["Who we are", "A technology-focused service company bringing development, design and innovation together under one roof."],
-  ["What we do", "We build websites, stores, brands and automations — and help businesses keep improving them after launch."],
-  ["Why we started", "Too many businesses juggle separate vendors for design, development and marketing. We started 3FoundersLab to be one accountable partner for all of it."],
-  ["Our approach", "Understand the business first, then choose the simplest technology that solves the real problem — and measure what changes."],
+  ["What we do", "We build websites, stores, brands and automations - and help businesses keep improving them after launch."],
+  ["Why we started", "Ideas get lost between separate designers, developers and marketers. We started 3FoundersLab to bring them together."],
+  ["Our approach", "Understand the business first, then choose the simplest technology that solves the real problem - and measure what changes."],
 ];
 
 const values = [
@@ -31,7 +31,7 @@ function AboutPage() {
   return (
     <>
       <PageHero eyebrow="About us" title={<>We Are 3FoundersLab. <span className="text-brand">We Build With Purpose.</span></>}
-        description="Technology, creativity and strategy under one roof — for startups, small businesses and growing brands." />
+        description="Technology, creativity and strategy under one roof - for startups, small businesses and growing brands." />
 
       <section className="section-y">
         <div className="container-site grid gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-2">

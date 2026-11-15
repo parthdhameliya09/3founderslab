@@ -1,87 +1,120 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Lightbulb, BadgeCheck, Eye, Sparkles, ShieldCheck, RefreshCw, User } from "lucide-react";
-import { team } from "@/data/people";
-import { PageHero, Reveal, SectionHeading, CtaSection } from "@/components/site/ui";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
+import { getPost, posts, formatDate, type Block } from "@/data/blogs";
+import { BlogCard, BlogCover, CtaSection, Reveal } from "@/components/site/ui";
 
 export const Route = createFileRoute("/blogs/$slug")({
-  head: () => ({
-    meta: [
-      { title: "About Us | 3FoundersLab" },
-      { name: "description", content: "3FoundersLab is a technology-focused service company bringing together development, design and innovation." },
-      { property: "og:title", content: "About 3FoundersLab" },
-      { property: "og:description", content: "We are 3FoundersLab. We build with purpose." },
-    ],
+  loader: ({ params }) => {
+    const post = getPost(params.slug);
+    if (!post) throw notFound();
+    return { post };
+  },
+  head: ({ loaderData }) => ({
+    meta: loaderData
+      ? [
+          { title: `${loaderData.post.title} | 3FoundersLab` },
+          { name: "description", content: loaderData.post.excerpt },
+          { property: "og:title", content: `${loaderData.post.title} | 3FoundersLab` },
+          { property: "og:description", content: loaderData.post.excerpt },
+          { property: "og:type", content: "article" },
+        ]
+      : [{ title: "Blog not found | 3FoundersLab" }, { name: "robots", content: "noindex" }],
   }),
-  component: AboutPage,
+  component: BlogPostPage,
+  notFoundComponent: () => (
+    <div className="container-site section-y text-center">
+      <h1 className="text-4xl font-bold">Blog not found</h1>
+      <p className="mt-3 text-muted-foreground">This blog doesn't exist or has been moved.</p>
+      <Link to="/blogs" className="btn btn-dark mt-8">Back to Blogs</Link>
+    </div>
+  ),
+  errorComponent: () => (
+    <div className="container-site section-y text-center">
+      <h1 className="text-3xl font-bold">Couldn't load this blog.</h1>
+      <Link to="/blogs" className="btn btn-dark mt-8">Back to Blogs</Link>
+    </div>
+  ),
 });
 
-const story = [
-  ["Who we are", "A technology-focused service company bringing development, design and innovation together under one roof."],
-  ["What we do", "We build websites, stores, brands and automations — and help businesses keep improving them after launch."],
-  ["Why we started", "Too many businesses juggle separate vendors for design, development and marketing. We started 3FoundersLab to be one accountable partner for all of it."],
-  ["Our approach", "Understand the business first, then choose the simplest technology that solves the real problem — and measure what changes."],
-];
+function renderBlock(b: Block, i: number) {
+  switch (b.type) {
+    case "h2": return <h2 key={i}>{b.text}</h2>;
+    case "h3": return <h3 key={i}>{b.text}</h3>;
+    case "p": return <p key={i}>{b.text}</p>;
+    case "quote": return <blockquote key={i}>{b.text}</blockquote>;
+    case "ul": return <ul key={i}>{b.items.map((t) => <li key={t}>{t}</li>)}</ul>;
+    case "ol": return <ol key={i}>{b.items.map((t) => <li key={t}>{t}</li>)}</ol>;
+    case "code": return <pre key={i}><code>{b.code}</code></pre>;
+    case "table":
+      return (
+        <div key={i} className="overflow-x-auto">
+          <table>
+            <thead><tr>{b.head.map((h) => <th key={h}>{h}</th>)}</tr></thead>
+            <tbody>{b.rows.map((r, ri) => <tr key={ri}>{r.map((c, ci) => <td key={ci}>{c}</td>)}</tr>)}</tbody>
+          </table>
+        </div>
+      );
+    case "image":
+      return (
+        <figure key={i} className="my-8">
+          <img src={b.src} alt={b.alt} loading="lazy" className="w-full rounded-lg" />
+          {b.caption && <figcaption className="mt-2 text-center text-sm text-muted-foreground">{b.caption}</figcaption>}
+        </figure>
+      );
+    case "embed":
+      return (
+        <div key={i} className="my-8 aspect-video overflow-hidden rounded-lg bg-surface">
+          <iframe
+            src={b.src} title={b.title} loading="lazy" allowFullScreen
+            sandbox="allow-scripts allow-same-origin allow-presentation"
+            referrerPolicy="strict-origin-when-cross-origin"
+            className="h-full w-full border-0"
+          />
+        </div>
+      );
+  }
+}
 
-const values = [
-  [Lightbulb, "Innovation"], [BadgeCheck, "Quality"], [Eye, "Transparency"],
-  [Sparkles, "Creativity"], [ShieldCheck, "Reliability"], [RefreshCw, "Continuous improvement"],
-] as const;
+function BlogPostPage() {
+  const { post } = Route.useLoaderData();
+  const related = posts.filter((p) => p.slug !== post.slug).slice(0, 3);
 
-function AboutPage() {
   return (
     <>
-      <PageHero eyebrow="About us" title={<>We Are 3FoundersLab. <span className="text-brand">We Build With Purpose.</span></>}
-        description="Technology, creativity and strategy under one roof — for startups, small businesses and growing brands." />
+      <article>
+        <header className="container-site pt-12 md:pt-20">
+          <Link to="/blogs" className="link-arrow text-muted-foreground"><ArrowLeft className="h-4 w-4" /> All blogs</Link>
+          <p className="eyebrow mt-10">{post.category}</p>
+          <h1 className="mt-4 max-w-4xl text-4xl font-bold leading-[1.05] md:text-6xl">{post.title}</h1>
+          <p className="mt-6 max-w-2xl text-lg text-muted-foreground">{post.excerpt}</p>
+          <div className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-1 border-y py-4 text-sm text-muted-foreground">
+            <span className="font-medium text-foreground">{post.author.name}</span>
+            <span aria-hidden>·</span>
+            <time dateTime={post.date}>{formatDate(post.date)}</time>
+            <span aria-hidden>·</span>
+            <span>{post.readMinutes} min read</span>
+          </div>
+          <BlogCover post={post} className="mt-10 aspect-[16/7] rounded-xl" />
+        </header>
 
-      <section className="section-y">
-        <div className="container-site grid gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-2">
-          {story.map(([h, t], i) => (
-            <Reveal key={h} delay={(i % 2) * 80} className="h-full"><div className="h-full bg-background p-8 md:p-10">
-              <span className="font-mono text-xs text-brand">0{i + 1}</span>
-              <h2 className="mt-4 text-2xl font-bold">{h}</h2>
-              <p className="mt-3 leading-relaxed text-muted-foreground">{t}</p>
-            </div></Reveal>
-          ))}
-        </div>
-      </section>
-
-      <section className="section-y bg-foreground text-background">
-        <div className="container-site grid gap-12 md:grid-cols-2">
-          <Reveal><p className="eyebrow">Mission</p><p className="mt-4 text-2xl font-semibold leading-snug md:text-3xl">To help businesses build a complete digital ecosystem that makes them look professional, operate efficiently and grow online.</p></Reveal>
-          <Reveal delay={120}><p className="eyebrow">Vision</p><p className="mt-4 text-2xl font-semibold leading-snug md:text-3xl">To be the technology partner ambitious businesses trust from their first website to their next transformation.</p></Reveal>
-        </div>
-      </section>
-
-      <section className="section-y">
-        <div className="container-site">
-          <SectionHeading eyebrow="Values" title="What guides our work." />
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {values.map(([Icon, v], i) => (
-              <Reveal key={v} delay={(i % 3) * 70}><div className="flex items-center gap-4 border-b pb-6">
-                <Icon className="h-6 w-6 text-brand" strokeWidth={1.6} /><span className="text-xl font-semibold">{v}</span>
-              </div></Reveal>
-            ))}
+        <div className="container-site section-y">
+          <div className="prose-article mx-auto max-w-3xl">
+            {post.body.map(renderBlock)}
           </div>
         </div>
-      </section>
+      </article>
 
-      <section className="section-y bg-surface">
-        <div className="container-site">
-          <SectionHeading eyebrow="Team" title="The people behind the lab." description="Founder and team profiles will appear here." />
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {team.map((m, i) => (
-              <Reveal key={i} delay={i * 80}>
-                <div className="flex aspect-[4/5] items-center justify-center rounded-lg border bg-background">
-                  {m.photo ? <img src={m.photo} alt={m.name} className="h-full w-full rounded-lg object-cover" /> : <User className="h-14 w-14 text-border" strokeWidth={1.2} />}
-                </div>
-                <h3 className="mt-5 text-lg font-semibold">{m.name}</h3>
-                <p className="text-sm text-brand">{m.role}</p>
-                <p className="mt-2 text-sm text-muted-foreground">{m.bio}</p>
-              </Reveal>
-            ))}
+      {related.length > 0 && (
+        <section className="border-t bg-surface pt-12 pb-12">
+          <div className="container-site">
+            <h2 className="mb-8 text-2xl font-bold md:text-3xl">More blogs</h2>
+            <div className="grid gap-10 md:grid-cols-3">
+              {related.map((p, i) => <Reveal key={p.slug} delay={i * 80}><BlogCard post={p} /></Reveal>)}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
       <CtaSection />
     </>
   );

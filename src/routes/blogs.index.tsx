@@ -7,9 +7,9 @@ import { PageHero, BlogCard, BlogCover, Reveal } from "@/components/site/ui";
 export const Route = createFileRoute("/blogs/")({
   head: () => ({
     meta: [
-      { title: "Blogs & Insights | 3FoundersLab" },
-      { name: "description", content: "Articles on web development, UI/UX, AI automation, SEO and business growth from 3FoundersLab." },
-      { property: "og:title", content: "Blogs & Insights | 3FoundersLab" },
+      { title: "Blogs | 3FoundersLab" },
+      { name: "description", content: "Blogs on web development, UI/UX, AI automation, SEO and business growth from 3FoundersLab." },
+      { property: "og:title", content: "Blogs | 3FoundersLab" },
       { property: "og:description", content: "Thoughts, ideas & digital insights." },
     ],
   }),
@@ -38,7 +38,7 @@ function BlogsPage() {
             <h2 className="mt-4 text-3xl font-bold leading-tight group-hover:text-brand md:text-4xl">{featured.title}</h2>
             <p className="mt-4 text-lg text-muted-foreground">{featured.excerpt}</p>
             <p className="mt-4 text-sm text-muted-foreground">{formatDate(featured.date)} · {featured.readMinutes} min read</p>
-            <span className="link-arrow mt-6">Read Article <ArrowRight className="h-4 w-4" /></span>
+            <span className="link-arrow mt-6">Read Blog <ArrowRight className="h-4 w-4" /></span>
           </div>
         </Link>
       </section>
@@ -53,16 +53,16 @@ function BlogsPage() {
               ))}
             </div>
             <label className="relative w-full lg:w-72">
-              <span className="sr-only">Search articles</span>
+              <span className="sr-only">Search blogs</span>
               <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search articles" className="field !pl-9" maxLength={100} />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search blogs" className="field !pl-9" maxLength={100} />
             </label>
           </div>
-          <h2 className="mb-8 text-2xl font-bold">Latest articles</h2>
+          <h2 className="mb-8 text-2xl font-bold">Latest blogs</h2>
           <div className="grid gap-x-8 gap-y-14 md:grid-cols-2 lg:grid-cols-3">
             {list.map((p, i) => <Reveal key={p.slug} delay={(i % 3) * 80}><BlogCard post={p} /></Reveal>)}
           </div>
-          {list.length === 0 && <p className="text-muted-foreground">No articles match your search.</p>}
+          {list.length === 0 && <p className="text-muted-foreground">No blogs match your search.</p>}
         </div>
       </section>
     </>
