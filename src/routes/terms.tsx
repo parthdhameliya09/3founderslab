@@ -1,6 +1,13 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/terms')({
+    head: () =>
+        seo({
+            title: 'Terms & Conditions',
+            description: 'The terms for using the 3FoundersLab website and making enquiries about our web development, design and automation services.',
+            path: '/terms',
+        }),
     component: TermsPage,
 })
 
@@ -61,7 +68,7 @@ const sections = [
 
 function TermsPage() {
     return (
-        <main className="min-h-screen bg-white px-5 py-14 text-[#080808] sm:px-8 sm:py-20">
+        <div className="min-h-screen bg-white px-5 py-14 text-[#080808] sm:px-8 sm:py-20">
             <article className="mx-auto w-full max-w-[820px]">
                 <Link to="/" className="inline-flex items-center text-[13px] font-semibold text-[#2563eb] hover:underline">← Back to home</Link>
                 <p className="mt-10 text-[11px] font-bold tracking-[0.12em] text-[#2563eb]">LEGAL</p>
@@ -85,6 +92,6 @@ function TermsPage() {
                     <Link to="/privacy" className="font-semibold text-[#2563eb] hover:underline">Privacy Policy →</Link>
                 </div>
             </article>
-        </main>
+        </div>
     )
 }

@@ -13,10 +13,19 @@ export const testimonials: Testimonial[] = [
   { name: "Sneha Kapoor", company: "Verve Studio", role: "Founder", quote: "From the logo to the final website, everything feels consistent and professional. Clients now notice our brand right away, and we get more enquiries.", placeholder: true, highlight: "Branding" },
 ];
 
-export type TeamMember = { name: string; role: string; bio: string; photo?: string; linkedin?: string };
+export type TeamMember = {
+  name: string; role: string; bio: string; photo?: string; linkedin?: string;
+  /** Personal website or portfolio. */
+  website?: string;
+  /** Skills listed in schema.org data (Google "knowsAbout"). */
+  expertise?: string[];
+};
 
 export const team: TeamMember[] = [
-  { name: "Adarsh Kori", role: "Founder", bio: "🚀 Specializing in WordPress, Shopify & Webflow development, delivering scalable digital experiences, seamless CMS solutions, and growth-driven websites.💡", photo: adarsh, linkedin: "https://www.linkedin.com/in/adarsh-kori-ab4072281" },
-  { name: "Kaushal Kalal", role: "Founder", bio: "🚀 Specializing in Digital Marketing, Meta Ads & MERN Stack development, combining strategic campaigns with scalable web solutions.💡", photo: kaushal, linkedin: "https://www.linkedin.com/in/kaushal-kalal-283490312" },
-  { name: "Parth Dhameliya", role: "Founder", bio: "🚀 Specializing in AI Automation & AI/ML, with a focus on project execution, client management, and practical solutions.💡", photo: parth, linkedin: "https://in.linkedin.com/in/parthdhameliya" },
+  { name: "Adarsh Kori", role: "Founder", bio: "🚀 Specializing in WordPress, Shopify & Webflow development, delivering scalable digital experiences, seamless CMS solutions, and growth-driven websites.💡", photo: adarsh, linkedin: "https://www.linkedin.com/in/adarsh-kori-ab4072281",
+    expertise: ["WordPress Development", "Shopify Development", "Webflow Development", "CMS Solutions", "Website Development"] },
+  { name: "Kaushal Kalal", role: "Founder", bio: "🚀 Specializing in Digital Marketing, Meta Ads & MERN Stack development, combining strategic campaigns with scalable web solutions.💡", photo: kaushal, linkedin: "https://www.linkedin.com/in/kaushal-kalal-283490312",
+    expertise: ["Digital Marketing", "Meta Ads", "MERN Stack Development", "Web Development"] },
+  { name: "Parth Dhameliya", role: "Founder", bio: "🚀 Specializing in AI Automation & AI/ML, with a focus on project execution, client management, and practical solutions.💡", photo: parth, linkedin: "https://in.linkedin.com/in/parthdhameliya", website: "https://parthdhameliya.tech",
+    expertise: ["AI Automation", "Artificial Intelligence", "Machine Learning", "Project Management", "Client Management"] },
 ];

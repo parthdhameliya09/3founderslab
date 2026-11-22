@@ -2,6 +2,9 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { getPost, posts, formatDate, type Block } from "@/data/blogs";
 import { BlogCard, BlogCover, CtaSection, Reveal } from "@/components/site/ui";
+import { seo, breadcrumbs, absUrl, SITE_URL } from "@/lib/seo";
+import { orgRef } from "@/lib/schema";
+import logo from "@/assets/logo.webp";
 
 export const Route = createFileRoute("/blogs/$slug")({
   loader: ({ params }) => {
@@ -9,17 +12,42 @@ export const Route = createFileRoute("/blogs/$slug")({
     if (!post) throw notFound();
     return { post };
   },
-  head: ({ loaderData }) => ({
-    meta: loaderData
-      ? [
-          { title: `${loaderData.post.title} | 3FoundersLab` },
-          { name: "description", content: loaderData.post.excerpt },
-          { property: "og:title", content: `${loaderData.post.title} | 3FoundersLab` },
-          { property: "og:description", content: loaderData.post.excerpt },
-          { property: "og:type", content: "article" },
-        ]
-      : [{ title: "Blog not found | 3FoundersLab" }, { name: "robots", content: "noindex" }],
-  }),
+  head: ({ loaderData }) => {
+    if (!loaderData) return { meta: [{ title: "Blog not found | 3FoundersLab" }, { name: "robots", content: "noindex" }] };
+    const { post } = loaderData;
+    const path = `/blogs/${post.slug}`;
+    const image = post.cover ? new URL(post.cover, SITE_URL).href : undefined;
+    const published = post.publishedAt ? `${post.publishedAt}:00+05:30` : post.date;
+    return seo({
+      title: post.title,
+      description: post.excerpt,
+      path,
+      image: post.cover,
+      imageAlt: post.coverAlt ?? post.title,
+      type: "article",
+      extra: [
+        { property: "article:published_time", content: published },
+        { property: "article:section", content: post.category },
+      ],
+      jsonLd: [
+        breadcrumbs([{ name: "Blogs", path: "/blogs" }, { name: post.title, path }]),
+        {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: post.title,
+          description: post.excerpt,
+          datePublished: published,
+          articleSection: post.category,
+          inLanguage: "en",
+          author: post.author.name === "3FoundersLab Team" ? orgRef : { "@type": "Person", name: post.author.name },
+          publisher: { ...orgRef, logo: { "@type": "ImageObject", url: new URL(logo, SITE_URL).href } },
+          isPartOf: { "@id": `${absUrl("/blogs")}#webpage` },
+          mainEntityOfPage: absUrl(path),
+          ...(image && { image }),
+        },
+      ],
+    });
+  },
   component: BlogPostPage,
   notFoundComponent: () => (
     <div className="container-site section-y text-center">
@@ -94,13 +122,16 @@ function BlogPostPage() {
             <span aria-hidden>·</span>
             <span>{post.readMinutes} min read</span>
           </div>
-          <BlogCover post={post} className="mt-10 aspect-[16/7] rounded-xl" />
+          <BlogCover post={post} eager natural className="mt-10 aspect-[16/7] rounded-xl" />
         </header>
 
         <div className="container-site section-y">
-          <div className="prose-article mx-auto max-w-3xl">
-            {post.body.map(renderBlock)}
-          </div>
+          {post.html ? (
+            // Built at compile time from our own Markdown files in src/content/blogs/ (trusted content).
+            <div className="prose-article mx-auto max-w-3xl" dangerouslySetInnerHTML={{ __html: post.html }} />
+          ) : (
+            <div className="prose-article mx-auto max-w-3xl">{post.body?.map(renderBlock)}</div>
+          )}
         </div>
       </article>
 

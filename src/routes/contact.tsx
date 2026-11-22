@@ -2,6 +2,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import emailjs from '@emailjs/browser'
+import * as SelectPrimitive from '@radix-ui/react-select'
+import { Check, ChevronDown } from 'lucide-react'
+import { seo, breadcrumbs } from '@/lib/seo'
+import { organizationSchema, webPageSchema, ORG_ID } from '@/lib/schema'
 
 // Google reCAPTCHA v2 ("I'm not a robot"). The site key is public; the secret key lives only in EmailJS.
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY as string | undefined
@@ -66,6 +70,22 @@ const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY as string | u
 type Status = 'idle' | 'sending' | 'success' | 'error'
 
 export const Route = createFileRoute('/contact')({
+  head: () =>
+    seo({
+      title: 'Contact Us: Start Your Website or Automation Project',
+      description: 'Tell 3FoundersLab about your website, e-commerce, design or AI automation project. Based in Ahmedabad, working worldwide. We reply within 24 hours.',
+      path: '/contact',
+      jsonLd: [
+        webPageSchema('ContactPage', {
+          path: '/contact',
+          name: 'Contact 3FoundersLab',
+          description: 'Contact 3FoundersLab by email, phone or the project enquiry form.',
+          extra: { mainEntity: { '@id': ORG_ID } },
+        }),
+        organizationSchema(),
+        breadcrumbs([{ name: 'Contact', path: '/contact' }]),
+      ],
+    }),
   component: ContactPage,
 })
 
@@ -79,6 +99,65 @@ const services = [
   'MERN',
   'Other',
 ]
+
+const budgetOptions = [
+  'Below ₹25,000',
+  '₹25,000 – ₹50,000',
+  '₹50,000 – ₹1,00,000',
+  '₹1,00,000 – ₹3,00,000',
+  '₹3,00,000+',
+]
+const contactOptions = ['Email', 'Phone', 'WhatsApp']
+
+/** Theme-styled dropdown. Renders in the page DOM (unlike a native <select> popup), so the custom cursor works over it. */
+function ThemedSelect({ label, name, placeholder, options, value, onChange }: {
+  label: string
+  name: string
+  placeholder?: string
+  options: string[]
+  value: string
+  onChange: (value: string) => void
+}) {
+  const labelId = `${name}-label`
+  return (
+    <div className="block text-[12px] font-semibold">
+      <span id={labelId}>{label}</span>
+      <SelectPrimitive.Root name={name} value={value || undefined} onValueChange={onChange}>
+        <SelectPrimitive.Trigger
+          aria-labelledby={labelId}
+          className="group mt-2 flex h-[42px] w-full items-center justify-between rounded-lg border border-[#e0e6ef] bg-[#f3f4f6] px-[15px] text-left text-[12px] font-normal text-[#111827] outline-none transition-colors hover:border-[#2563eb] focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/10 data-[placeholder]:text-[#64748b] data-[state=open]:border-[#2563eb] data-[state=open]:bg-white"
+        >
+          <SelectPrimitive.Value placeholder={placeholder} />
+          <SelectPrimitive.Icon asChild>
+            <ChevronDown className="h-4 w-4 text-[#64748b] transition-transform duration-200 group-data-[state=open]:rotate-180 group-data-[state=open]:text-[#2563eb]" />
+          </SelectPrimitive.Icon>
+        </SelectPrimitive.Trigger>
+        <SelectPrimitive.Portal>
+          <SelectPrimitive.Content
+            position="popper"
+            sideOffset={6}
+            className="z-50 w-[var(--radix-select-trigger-width)] overflow-hidden rounded-xl border border-[#e0e6ef] bg-white p-1.5 shadow-[0_12px_32px_-8px_rgba(15,23,42,0.18)] data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+          >
+            <SelectPrimitive.Viewport>
+              {options.map((option) => (
+                <SelectPrimitive.Item
+                  key={option}
+                  value={option}
+                  className="relative flex h-9 select-none items-center rounded-lg pl-3 pr-8 text-[12px] text-[#374151] outline-none transition-colors data-[highlighted]:bg-[#eff4ff] data-[highlighted]:text-[#1749bd] data-[state=checked]:font-semibold data-[state=checked]:text-[#080808]"
+                >
+                  <SelectPrimitive.ItemText>{option}</SelectPrimitive.ItemText>
+                  <SelectPrimitive.ItemIndicator className="absolute right-3 text-[#2563eb]">
+                    <Check className="h-3.5 w-3.5" />
+                  </SelectPrimitive.ItemIndicator>
+                </SelectPrimitive.Item>
+              ))}
+            </SelectPrimitive.Viewport>
+          </SelectPrimitive.Content>
+        </SelectPrimitive.Portal>
+      </SelectPrimitive.Root>
+    </div>
+  )
+}
 
 function MailIcon() {
   return (
@@ -111,6 +190,8 @@ function ContactPage() {
     'Website Development',
     'E-commerce',
   ])
+  const [budget, setBudget] = useState('')
+  const [preferredContact, setPreferredContact] = useState('Email')
   const [status, setStatus] = useState<Status>('idle')
   const [errorMessage, setErrorMessage] = useState('')
   const captcha = useRecaptcha(RECAPTCHA_SITE_KEY)
@@ -170,8 +251,8 @@ function ContactPage() {
           email: field('email'),
           phone: field('phone') || '—',
           services: selectedServices.join(', '),
-          budget: field('budget') || 'Not specified',
-          preferredContact: field('preferredContact') || 'Email',
+          budget: budget || 'Not specified',
+          preferredContact: preferredContact || 'Email',
           description: field('description'),
           submittedAt: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) + ' IST',
           // EmailJS verifies this token server-side when reCAPTCHA is enabled on the template.
@@ -187,6 +268,8 @@ function ContactPage() {
       )
       setStatus('success')
       form.reset()
+      setBudget('')
+      setPreferredContact('Email')
       captcha.reset()
     } catch (err) {
       // A token can only be used once, so always ask for a fresh tick after a failed attempt.
@@ -203,7 +286,7 @@ function ContactPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white px-5 py-12 text-[#080808] sm:px-8 sm:py-[72px]">
+    <div className="min-h-screen bg-white px-5 py-12 text-[#080808] sm:px-8 sm:py-[72px]">
       <div className="mx-auto grid w-full max-w-[1024px] grid-cols-1 items-start gap-8 lg:grid-cols-[388px_minmax(0,1fr)] lg:gap-9">
         <section className="pt-0 lg:pt-0">
           <p className="mb-4 text-[11px] font-bold tracking-[0.12em] text-[#2563eb]">CONTACT</p>
@@ -283,23 +366,21 @@ function ContactPage() {
             </fieldset>
 
             <div className="mt-[17px] grid grid-cols-1 gap-x-[14px] gap-y-[15px] sm:grid-cols-2">
-              <label className="block text-[12px] font-semibold">Estimated Budget
-                <select name="budget" defaultValue="" className="mt-2 h-[42px] w-full rounded-lg border border-[#e0e6ef] bg-[#f3f4f6] px-[15px] text-[12px] font-normal text-[#374151] outline-none focus:border-[#2563eb]">
-                  <option value="" disabled>Select range</option>
-                  <option>Below ₹25,000</option>
-                  <option>₹25,000 – ₹50,000</option>
-                  <option>₹50,000 – ₹1,00,000</option>
-                  <option>₹1,00,000 – ₹3,00,000</option>
-                  <option>₹3,00,000+</option>
-                </select>
-              </label>
-              <label className="block text-[12px] font-semibold">Preferred Contact
-                <select name="preferredContact" defaultValue="Email" className="mt-2 h-[42px] w-full rounded-lg border border-[#e0e6ef] bg-[#f3f4f6] px-[15px] text-[12px] font-normal text-[#374151] outline-none focus:border-[#2563eb]">
-                  <option>Email</option>
-                  <option>Phone</option>
-                  <option>WhatsApp</option>
-                </select>
-              </label>
+              <ThemedSelect
+                label="Estimated Budget"
+                name="budget"
+                placeholder="Select range"
+                options={budgetOptions}
+                value={budget}
+                onChange={setBudget}
+              />
+              <ThemedSelect
+                label="Preferred Contact"
+                name="preferredContact"
+                options={contactOptions}
+                value={preferredContact}
+                onChange={setPreferredContact}
+              />
             </div>
 
             <label className="mt-[17px] block text-[12px] font-semibold">Project Description *
@@ -336,6 +417,6 @@ function ContactPage() {
           </form>
         </section>
       </div>
-    </main>
+    </div>
   )
 }

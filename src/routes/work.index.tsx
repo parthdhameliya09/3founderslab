@@ -2,16 +2,25 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { projects, projectCategories } from "@/data/projects";
 import { PageHero, ProjectCard, Reveal, CtaSection } from "@/components/site/ui";
+import { seo, breadcrumbs } from "@/lib/seo";
+import { webPageSchema, itemList } from "@/lib/schema";
 
 export const Route = createFileRoute("/work/")({
-  head: () => ({
-    meta: [
-      { title: "Work & Portfolio | 3FoundersLab" },
-      { name: "description", content: "Selected websites, e-commerce stores, UI/UX, branding and automation projects by 3FoundersLab." },
-      { property: "og:title", content: "Work & Portfolio | 3FoundersLab" },
-      { property: "og:description", content: "Projects where design, technology and business goals come together." },
-    ],
-  }),
+  head: () =>
+    seo({
+      title: "Our Work: Website & E-commerce Portfolio",
+      description: "Selected websites, WooCommerce stores and UI/UX projects by 3FoundersLab, including Copier Bazar, Startup Minds and Adithyan Packers.",
+      path: "/work",
+      jsonLd: [
+        webPageSchema("CollectionPage", {
+          path: "/work",
+          name: "3FoundersLab Work & Portfolio",
+          description: "Website, e-commerce and UI/UX projects built by 3FoundersLab.",
+          extra: { mainEntity: itemList(projects.map((p) => ({ name: p.name, path: `/work/${p.slug}` }))) },
+        }),
+        breadcrumbs([{ name: "Work", path: "/work" }]),
+      ],
+    }),
   component: WorkPage,
 });
 

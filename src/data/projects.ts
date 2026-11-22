@@ -1,7 +1,6 @@
-import p1 from "@/assets/project-1.jpg";
-import p2 from "@/assets/project-2.jpg";
-import p3 from "@/assets/project-3.jpg";
-import p4 from "@/assets/project-4.jpg";
+import p1 from "@/assets/projects/copier_bazaar.png";
+import p2 from "@/assets/projects/startup_minds.png";
+import p3 from "@/assets/projects/adhithyam_packaging.png";
 
 export const projectCategories = ["All", "Website Development", "E-commerce", "UI/UX", "Branding", "Automation"] as const;
 export type ProjectCategory = Exclude<(typeof projectCategories)[number], "All">;
@@ -15,72 +14,79 @@ export type Project = {
   tech: string[];
   summary: string;
   image: string;
+  /** Extra preview images. The section is hidden when empty. */
   gallery: string[];
   liveUrl?: string;
   overview: string;
-  clientIntro: string;
-  challenge: string;
-  solution: string;
+  clientIntro?: string;
+  challenge?: string;
+  solution?: string;
+  /** Bullet list shown as "Key highlights". */
+  highlights?: string[];
   services: string[];
-  outcome: string;
+  outcome?: string;
 };
 
-// SAMPLE PROJECTS — placeholder case studies. Replace with real portfolio data.
+/**
+ * Project screenshots live in src/assets/projects/. Missing files fall back to a placeholder,
+ * so a new project can be added before its image is ready.
+ */
+const shots = import.meta.glob<string>("../assets/projects/*.{jpg,jpeg,png,webp}", { eager: true, import: "default" });
+const shot = (name: string, fallback: string) =>
+  Object.entries(shots).find(([path]) => path.split("/").pop()?.replace(/\.\w+$/, "") === name)?.[1] ?? fallback;
+
+const copierBazar = shot("copierbazar", p1);
+const startupMinds = shot("startupminds", p2);
+const adithyan = shot("karurappl", p3);
+
 export const projects: Project[] = [
   {
-    slug: "saas-website", name: "SaaS Website", client: "", industry: "Software",
-    category: "Website Development", tech: ["React", "TypeScript", "Tailwind CSS"], image: p1, gallery: [p1, p4],
-    summary: "a marketing website and dashboard preview for a software product.",
-    overview: "A fast, conversion-focused marketing site for a software product, built in six weeks. We handled design, development and launch.",
-    clientIntro: "An early-stage software company offering a project management tool to small teams.",
-    challenge: "The old site was slow and unclear. Visitors couldn't tell what the product did, and few signed up for a demo.",
-    solution: "We rewrote the messaging, added an interactive dashboard preview and rebuilt the site in React for speed, with a single clear call to action on every page.",
+    slug: "copier-bazar", name: "Copier Bazar", client: "Copier Bazar", industry: "Printing Supplies & E-commerce",
+    category: "Website Development", tech: ["WordPress", "WooCommerce", "SEO", "WhatsApp Integration"],
+    image: copierBazar, gallery: [], liveUrl: "https://copierbazar.com/",
+    summary: "A fast WooCommerce store for 2,000+ printers, toners, inks and printing accessories.",
+    overview: "Designed, developed, and optimized a fully responsive WooCommerce e-commerce website for Copier Bazar, featuring a large catalog of 2,000+ products, including printers, toner cartridges, ink, and printing accessories. Focused on delivering high performance, smooth navigation, and a seamless shopping experience while maintaining excellent loading speed despite the extensive product inventory.",
+    challenge: "With 2,000+ products, the store had to stay fast, easy to browse, and visible in search. Customers needed to find the right toner or cartridge in a few clicks, on any device.",
+    solution: "Implemented comprehensive SEO optimization, user-friendly product navigation, search functionality, and a streamlined shopping experience to support scalability, organic visibility, and business growth.",
+    highlights: [
+      "WooCommerce store with 2,000+ products.",
+      "Fast performance for a large catalog.",
+      "SEO-optimized site structure.",
+      "Filters, search, reviews and WhatsApp integration.",
+    ],
+    services: ["Website Development", "E-commerce Development", "UI/UX Design", "SEO"],
+  },
+  {
+    slug: "startup-minds", name: "Startup Minds", client: "Startup Minds", industry: "Startup Consulting & Media",
+    category: "Website Development", tech: ["Responsive Web Design", "UI/UX Design"],
+    image: startupMinds, gallery: [], liveUrl: "https://startupminds.com/",
+    summary: "A modern website for a startup consulting and media platform focused on fundraising.",
+    overview: "Designed and developed a modern, fully responsive website for Startup Minds, a startup consulting and media platform focused on fundraising, investment readiness, and business growth.",
+    challenge: "Founders need to trust an advisor before booking a call. The site had to build that trust quickly and present both the consulting services and the video content without losing focus on bookings.",
+    solution: "Created a professional UI/UX with engaging hero sections, founder profiles, client trust bar, service showcases, startup analysis content, and strategic call-to-action sections. Optimized the website for desktop and mobile devices to deliver a seamless browsing experience and encourage consultation bookings and business enquiries.",
+    highlights: [
+      "Modern, responsive UI/UX design.",
+      "Founder profiles, trust bar and testimonials.",
+      "Startup Minds Originals video section.",
+      "Clear CTAs for consultation bookings.",
+    ],
     services: ["Website Development", "UI/UX Design"],
-    outcome: "A faster site with a clearer story, and noticeably more demo requests in the first month after launch.",
   },
   {
-    slug: "online-store", name: "Online Store", client: "", industry: "Retail",
-    category: "E-commerce", tech: ["Shopify", "Liquid", "Razorpay"], image: p2, gallery: [p2, p1],
-    summary: "a mobile-first storefront with streamlined checkout.",
-    overview: "A mobile-first Shopify store with a custom theme and simplified checkout, delivered in five weeks.",
-    clientIntro: "A growing retail brand selling home and lifestyle products, mostly to shoppers on their phones.",
-    challenge: "Most visitors browsed on mobile but abandoned at checkout. Managing products and orders was also slow for the team.",
-    solution: "We built a lightweight custom theme, cut checkout to fewer steps, added Razorpay for local payments and set up simple product management.",
-    services: ["E-commerce Development", "UI/UX Design"],
-    outcome: "Smoother mobile checkout, fewer abandoned carts and a store the team can update without developer help.",
-  },
-  {
-    slug: "brand-identity", name: "Brand Identity", client: "", industry: "Consulting",
-    category: "Branding", tech: ["Figma", "Illustrator"], image: p3, gallery: [p3, p2],
-    summary: "a logo, visual identity and stationery system.",
-    overview: "A complete brand identity: logo, colours, typography and stationery, with a short guidelines document.",
-    clientIntro: "A boutique consulting firm preparing to take on larger corporate clients.",
-    challenge: "Their branding looked inconsistent across proposals, the website and social media, which hurt credibility with new clients.",
-    solution: "We designed a simple, confident logo, defined a colour and type system, and packaged it into templates the team can reuse.",
-    services: ["Branding & Logo Design"],
-    outcome: "A consistent, professional look across every touchpoint, and proposals the team is proud to send.",
-  },
-  {
-    slug: "workflow-automation", name: "Workflow Automation", client: "", industry: "Operations",
-    category: "Automation", tech: ["n8n", "OpenAI", "Node.js"], image: p4, gallery: [p4, p3],
-    summary: "connecting business tools to automate lead handling.",
-    overview: "An automated lead-handling workflow that connects the website, CRM and email, delivered in three weeks.",
-    clientIntro: "A services business receiving daily enquiries from its website, email and social channels.",
-    challenge: "Leads were copied by hand between tools. Replies were slow and some enquiries were missed entirely.",
-    solution: "We connected the forms, CRM and inbox with n8n, used OpenAI to sort and summarise enquiries, and sent instant acknowledgements.",
-    services: ["AI & Automation"],
-    outcome: "Hours of manual work removed each week, faster first replies and no more lost enquiries.",
-  },
-  {
-    slug: "product-design", name: "Product UI", client: "", industry: "Fintech",
-    category: "UI/UX", tech: ["Figma", "Design System"], image: p1, gallery: [p1, p2],
-    summary: "a design system and app interface for a web product.",
-    overview: "A design system and redesigned app interface for a web-based finance product.",
-    clientIntro: "A fintech startup whose product had grown quickly, one feature at a time.",
-    challenge: "Screens had become inconsistent and hard to use, and developers were rebuilding the same components repeatedly.",
-    solution: "We audited the product, defined shared components and styles in Figma, and redesigned the key flows around clear next steps.",
-    services: ["UI/UX & Creative Design"],
-    outcome: "A cleaner, easier-to-use interface and a shared design system that speeds up every new feature.",
+    slug: "adithyan-packers", name: "Adithyan Packers", client: "Adithyan Packers Pvt. Ltd.", industry: "Packaging Manufacturing",
+    category: "Website Development", tech: ["Responsive Web Design", "UI/UX Design", "WhatsApp Integration"],
+    image: adithyan, gallery: [], liveUrl: "https://karurappl.in/",
+    summary: "A corporate website showcasing flexible packaging solutions and manufacturing capabilities.",
+    overview: "Designed and developed a modern, fully responsive corporate website for Adithyan Packers Pvt. Ltd., showcasing their flexible packaging solutions, product range, company achievements, and manufacturing capabilities.",
+    challenge: "Business buyers want to see the product range, trust the manufacturer, and request a quote without a long back-and-forth. The site had to make all three simple.",
+    solution: "Created an engaging UI with responsive layouts, product showcases, clear call-to-action sections, and WhatsApp integration to help generate business enquiries and quotation requests.",
+    highlights: [
+      "Product showcase for packaging solutions.",
+      "Company statistics and achievements.",
+      "Step-by-step purchasing process.",
+      "WhatsApp integration for quick enquiries.",
+    ],
+    services: ["Website Development", "UI/UX Design"],
   },
 ];
 

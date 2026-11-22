@@ -3,16 +3,35 @@ import { ArrowRight, Check } from "lucide-react";
 import { services } from "@/data/services";
 import { PageHero, Reveal, CtaSection } from "@/components/site/ui";
 import { ServiceVisual } from "@/components/site/ServiceVisual";
+import { seo, breadcrumbs, absUrl } from "@/lib/seo";
+import { orgRef } from "@/lib/schema";
 
 export const Route = createFileRoute("/services")({
-  head: () => ({
-    meta: [
-      { title: "Services — Web, E-commerce, Design, Branding & AI | 3FoundersLab" },
-      { name: "description", content: "Website development, e-commerce, UI/UX, branding, AI automation, SEO, CMS and MERN stack development by 3FoundersLab." },
-      { property: "og:title", content: "Services | 3FoundersLab" },
-      { property: "og:description", content: "Digital solutions designed around your business." },
-    ],
-  }),
+  head: () =>
+    seo({
+      title: "Services: Web Development, E-commerce, UI/UX, SEO & AI",
+      description: "Website development, e-commerce, UI/UX design, branding, AI automation, SEO, CMS and MERN stack development by 3FoundersLab.",
+      path: "/services",
+      jsonLd: [
+        breadcrumbs([{ name: "Services", path: "/services" }]),
+        {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          itemListElement: services.map((s, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            item: {
+              "@type": "Service",
+              name: s.title,
+              description: s.description,
+              url: `${absUrl("/services")}#${s.slug}`,
+              provider: orgRef,
+              areaServed: "Worldwide",
+            },
+          })),
+        },
+      ],
+    }),
   component: ServicesPage,
 });
 

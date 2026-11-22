@@ -1,42 +1,60 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Menu, X, ArrowUpRight } from "lucide-react";
 import { navLinks } from "@/data/site";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo.webp";
+
+function useRouteProgress() {
+  const routerLoading = useRouterState({ select: (s) => s.isLoading || s.status === "pending" });
+  // Starts true so the server-rendered HTML already contains the bar on a hard reload.
+  const [docLoading, setDocLoading] = useState(true);
+  const isLoading = routerLoading || docLoading;
+  const [progress, setProgress] = useState(0);
+  const [visible, setVisible] = useState(true);
+  const barRef = useRef<HTMLDivElement>(null);
+
+  // Hydration means the page is usable, so finish the bar then instead of waiting for
+  // slow images/fonts. Before that, a CSS animation (no JS needed) keeps the bar moving.
+  useEffect(() => {
+    const bar = barRef.current;
+    if (bar?.parentElement) {
+      const pct = (bar.getBoundingClientRect().width / bar.parentElement.getBoundingClientRect().width) * 100;
+      setProgress(Math.max(pct || 0, 15));
+    }
+    requestAnimationFrame(() => setDocLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (isLoading) {
+      setVisible(true);
+      if (docLoading) return; // initial page load: handled by the CSS animation above
+      setProgress(15);
+      const id = setInterval(() => setProgress((p) => (p < 85 ? p + (90 - p) * 0.12 : p)), 120);
+      return () => clearInterval(id);
+    }
+    setProgress((p) => (p > 0 ? 100 : 0));
+    const hide = setTimeout(() => setVisible(false), 250);
+    const reset = setTimeout(() => setProgress(0), 600);
+    return () => {
+      clearTimeout(hide);
+      clearTimeout(reset);
+    };
+  }, [isLoading]);
+
+  return { progress, visible, barRef, docLoading };
+}
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { progress, visible, barRef, docLoading } = useRouteProgress();
 
   useEffect(() => {
-    const updateScroll = () => {
-      setScrolled(window.scrollY > 12);
-
-      const winHeight = window.innerHeight;
-      const docHeight = document.documentElement.scrollHeight;
-      const totalScroll = docHeight - winHeight;
-
-      if (totalScroll > 0) {
-        const progress = (window.scrollY / totalScroll) * 100;
-        setScrollProgress(Math.min(100, Math.max(0, progress)));
-      } else {
-        setScrollProgress(0);
-      }
-    };
-
+    const updateScroll = () => setScrolled(window.scrollY > 12);
     updateScroll();
-    const timer = setTimeout(updateScroll, 100);
-
     window.addEventListener("scroll", updateScroll, { passive: true });
-    window.addEventListener("resize", updateScroll);
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener("scroll", updateScroll);
-      window.removeEventListener("resize", updateScroll);
-    };
-  }, [pathname]);
+    return () => window.removeEventListener("scroll", updateScroll);
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -44,12 +62,13 @@ export function Navbar() {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${open
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        open
           ? "border-b bg-background"
           : scrolled
-            ? "border-b bg-background/90 backdrop-blur-md"
-            : "border-b border-transparent bg-background"
-        }`}
+          ? "border-b bg-background/90 backdrop-blur-md"
+          : "border-b border-transparent bg-background"
+      }`}
     >
       <nav className="container-site flex h-16 items-center justify-between md:h-20" aria-label="Main">
         <a href="/" target="_self" rel="noopener noreferrer">
@@ -90,8 +109,9 @@ export function Navbar() {
 
       {/* Mobile navigation drawer */}
       <div
-        className={`fixed inset-x-0 top-16 h-[calc(100dvh-4rem)] bg-background overflow-y-auto transition-all duration-300 md:hidden z-50 ${open ? "visible opacity-100 translate-y-0" : "invisible -translate-y-2 opacity-0 pointer-events-none"
-          }`}
+        className={`fixed inset-x-0 top-16 h-[calc(100dvh-4rem)] bg-background overflow-y-auto transition-all duration-300 md:hidden z-50 ${
+          open ? "visible opacity-100 translate-y-0" : "invisible -translate-y-2 opacity-0 pointer-events-none"
+        }`}
         style={{ backgroundColor: "var(--background)" }}
       >
         <div className="container-site flex flex-col justify-between min-h-full pt-6 pb-12">
@@ -100,8 +120,9 @@ export function Navbar() {
               <li
                 key={l.to}
                 style={{ transitionDelay: open ? `${i * 35}ms` : "0ms" }}
-                className={`transition-all duration-300 ${open ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
-                  }`}
+                className={`transition-all duration-300 ${
+                  open ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+                }`}
               >
                 <Link
                   to={l.to}
@@ -125,15 +146,16 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Universal Scroll Progress Indicator */}
+      {/* Route loading progress bar */}
       <div
-        className={`absolute bottom-0 left-0 right-0 h-[2.5px] w-full overflow-hidden pointer-events-none transition-colors duration-300 ${scrolled ? "bg-border/30" : "bg-transparent"
-          }`}
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-[3px] w-full overflow-hidden"
+        style={{ opacity: visible ? 1 : 0, transition: "opacity 300ms ease-out" }}
         aria-hidden="true"
       >
         <div
-          className="h-full bg-gradient-to-r from-brand via-brand to-brand-deep transition-all duration-100 ease-out shadow-[0_0_8px_rgba(59,130,246,0.5)]"
-          style={{ width: `${scrollProgress}%` }}
+          ref={barRef}
+          className={`h-full rounded-r-full ${docLoading ? "boot-progress" : ""} bg-gradient-to-r from-black via-brand to-brand-deep shadow-[0_0_10px_rgba(37,99,235,0.6)]`}
+          style={{ ...(docLoading && progress === 0 ? {} : { width: `${progress}%` }), transition: progress === 0 ? "none" : "width 250ms ease-out" }}
         />
       </div>
     </header>

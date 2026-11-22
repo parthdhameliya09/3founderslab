@@ -1,7 +1,9 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Check } from "lucide-react";
 import { getProject, projects } from "@/data/projects";
 import { Reveal, CtaSection } from "@/components/site/ui";
+import { seo, breadcrumbs, absUrl, SITE_URL } from "@/lib/seo";
+import { orgRef } from "@/lib/schema";
 
 export const Route = createFileRoute("/work/$slug")({
   loader: ({ params }) => {
@@ -9,17 +11,34 @@ export const Route = createFileRoute("/work/$slug")({
     if (!project) throw notFound();
     return { project };
   },
-  head: ({ loaderData }) => ({
-    meta: loaderData
-      ? [
-          { title: `${loaderData.project.name} — Case Study | 3FoundersLab` },
-          { name: "description", content: loaderData.project.summary },
-          { property: "og:title", content: `${loaderData.project.name} | 3FoundersLab` },
-          { property: "og:description", content: loaderData.project.summary },
-          { property: "og:type", content: "article" },
-        ]
-      : [{ title: "Project unavailable | 3FoundersLab" }, { name: "robots", content: "noindex" }],
-  }),
+  head: ({ loaderData }) => {
+    if (!loaderData) return { meta: [{ title: "Project unavailable | 3FoundersLab" }, { name: "robots", content: "noindex" }] };
+    const p = loaderData.project;
+    const path = `/work/${p.slug}`;
+    return seo({
+      title: `${p.name}: ${p.category} Case Study`,
+      description: p.summary,
+      path,
+      image: p.image,
+      imageAlt: `${p.name} website shown on desktop and mobile`,
+      type: "article",
+      jsonLd: [
+        breadcrumbs([{ name: "Work", path: "/work" }, { name: p.name, path }]),
+        {
+          "@context": "https://schema.org",
+          "@type": "CreativeWork",
+          name: `${p.name} ${p.category}`,
+          description: p.overview,
+          url: absUrl(path),
+          image: new URL(p.image, SITE_URL).href,
+          creator: orgRef,
+          isPartOf: { "@id": `${absUrl("/work")}#webpage` },
+          ...(p.client ? { about: { "@type": "Organization", name: p.client, ...(p.liveUrl ? { url: p.liveUrl } : {}) } } : {}),
+          keywords: [...p.services, ...p.tech].join(", "),
+        },
+      ],
+    });
+  },
   component: ProjectPage,
   notFoundComponent: () => (
     <div className="container-site section-y text-center">
@@ -36,9 +55,9 @@ function ProjectPage() {
   const prev = projects[(i - 1 + projects.length) % projects.length];
   const next = projects[(i + 1) % projects.length];
 
-  const sections: [string, string][] = [
+  const sections = ([
     ["Project overview", p.overview], ["The challenge", p.challenge], ["Our solution", p.solution],
-  ];
+  ] as [string, string | undefined][]).filter((s): s is [string, string] => Boolean(s[1]));
 
   return (
     <>
@@ -72,24 +91,40 @@ function ProjectPage() {
             {sections.map(([h, t]) => (
               <Reveal key={h}><h2 className="text-2xl font-bold md:text-3xl">{h}</h2><p className="mt-4 text-lg leading-relaxed text-muted-foreground">{t}</p></Reveal>
             ))}
+            {p.highlights && p.highlights.length > 0 && (
+              <Reveal>
+                <h2 className="text-2xl font-bold md:text-3xl">Key highlights</h2>
+                <ul className="mt-6 grid gap-x-6 sm:grid-cols-2">
+                  {p.highlights.map((h) => (
+                    <li key={h} className="flex items-start gap-2.5 border-b py-3 text-[0.95rem]">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand" />{h.replace(/\.$/, "")}
+                    </li>
+                  ))}
+                </ul>
+              </Reveal>
+            )}
           </div>
         </div>
       </section>
 
-      <section className="container-site">
-        <h2 className="mb-6 text-2xl font-bold">Design & development previews</h2>
-        <div className="grid gap-6 md:grid-cols-2">
-          {p.gallery.map((g, k) => <img key={k} src={g} alt={`${p.name} preview ${k + 1}`} loading="lazy" width={1600} height={1008} className="aspect-[4/3] w-full rounded-xl bg-surface object-cover" />)}
-        </div>
-      </section>
+      {p.gallery.length > 0 && (
+        <section className="container-site">
+          <h2 className="mb-6 text-2xl font-bold">Design & development previews</h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            {p.gallery.map((g, k) => <img key={k} src={g} alt={`${p.name} preview ${k + 1}`} loading="lazy" width={1600} height={1008} className="aspect-[4/3] w-full rounded-xl bg-surface object-cover" />)}
+          </div>
+        </section>
+      )}
 
       <section className="section-y">
         <div className="container-site">
-          <Reveal className="rounded-xl bg-brand-soft p-8 md:p-12">
-            <p className="eyebrow">Final outcome</p>
-            <p className="mt-4 max-w-3xl text-2xl font-semibold leading-snug md:text-3xl">{p.outcome}</p>
-          </Reveal>
-          <nav className="mt-14 grid gap-4 border-t pt-8 sm:grid-cols-2" aria-label="Project navigation">
+          {p.outcome && (
+            <Reveal className="rounded-xl bg-brand-soft p-8 md:p-12">
+              <p className="eyebrow">Final outcome</p>
+              <p className="mt-4 max-w-3xl text-2xl font-semibold leading-snug md:text-3xl">{p.outcome}</p>
+            </Reveal>
+          )}
+          <nav className={`grid gap-4 border-t pt-8 sm:grid-cols-2 ${p.outcome ? "mt-14" : ""}`} aria-label="Project navigation">
             <Link to="/work/$slug" params={{ slug: prev.slug }} className="group"><span className="flex items-center gap-1 text-sm text-muted-foreground"><ArrowLeft className="h-4 w-4" /> Previous</span><span className="mt-1 block text-lg font-semibold group-hover:text-brand">{prev.name}</span></Link>
             <Link to="/work/$slug" params={{ slug: next.slug }} className="group sm:text-right"><span className="flex items-center gap-1 text-sm text-muted-foreground sm:justify-end">Next <ArrowRight className="h-4 w-4" /></span><span className="mt-1 block text-lg font-semibold group-hover:text-brand">{next.name}</span></Link>
           </nav>

@@ -55,6 +55,16 @@ export function CustomCursor() {
       }
     };
 
+    // Iframes (reCAPTCHA, embeds) are separate documents: they stop sending pointer events to
+    // this page and show their own cursor. Hide ours there so it doesn't freeze at the edge.
+    const isFrame = (el: EventTarget | null) => el instanceof HTMLIFrameElement;
+    const onPointerOver = (e: PointerEvent) => { if (isFrame(e.target)) setVisible(false); };
+    // Entering a cross-origin iframe fires pointerout with relatedTarget = null (the frame's
+    // contents are another document), so treat a null target as "pointer left this page".
+    const onPointerOut = (e: PointerEvent) => {
+      if (!e.relatedTarget || isFrame(e.relatedTarget)) setVisible(false);
+    };
+
     const onPointerDown = () => setIsClicked(true);
     const onPointerUp = () => setIsClicked(false);
     const onMouseLeave = () => setVisible(false);
@@ -64,6 +74,8 @@ export function CustomCursor() {
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("pointerdown", onPointerDown);
     window.addEventListener("pointerup", onPointerUp);
+    document.addEventListener("pointerover", onPointerOver);
+    document.addEventListener("pointerout", onPointerOut);
     document.addEventListener("mouseleave", onMouseLeave);
     document.addEventListener("mouseenter", onMouseEnter);
 
@@ -73,6 +85,8 @@ export function CustomCursor() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("pointerup", onPointerUp);
+      document.removeEventListener("pointerover", onPointerOver);
+      document.removeEventListener("pointerout", onPointerOut);
       document.removeEventListener("mouseleave", onMouseLeave);
       document.removeEventListener("mouseenter", onMouseEnter);
     };
