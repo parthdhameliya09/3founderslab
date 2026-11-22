@@ -67,7 +67,7 @@ Costs vary depending on the hosting provider and the features required. You can 
 | :---: | :---: | :---: |
 | Ease of use | Visual development interface | Depends on themes and setup |
 | Design flexibility | Strong visual design control | Extensive themes and customization |
-| Performance  | Managed hosting environme | Depends on hosting and optimization |
+| Performance  | Managed hosting environment | Depends on hosting and optimization |
 | SEO | Managed platform infrastructure | SEO plugins and built-in controls |
 | Security | Managed platform infrastructure | Requires ongoing maintenance |
 | Plugins | Platform integrations and apps | Large plugin ecosystem |
