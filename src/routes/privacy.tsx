@@ -1,6 +1,13 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/privacy')({
+  head: () =>
+    seo({
+      title: 'Privacy Policy',
+      description: 'How 3FoundersLab collects, uses and protects information when you visit our website or contact us about our services.',
+      path: '/privacy',
+    }),
   component: PrivacyPage,
 })
 
@@ -45,7 +52,7 @@ const sections = [
 
 function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-white px-5 py-14 text-[#080808] sm:px-8 sm:py-20">
+    <div className="min-h-screen bg-white px-5 py-14 text-[#080808] sm:px-8 sm:py-20">
       <article className="mx-auto w-full max-w-[820px]">
         <Link to="/" className="inline-flex items-center text-[13px] font-semibold text-[#2563eb] hover:underline">← Back to home</Link>
         <p className="mt-10 text-[11px] font-bold tracking-[0.12em] text-[#2563eb]">LEGAL</p>
@@ -69,6 +76,6 @@ function PrivacyPage() {
           <Link to="/terms" className="font-semibold text-[#2563eb] hover:underline">Terms &amp; Conditions →</Link>
         </div>
       </article>
-    </main>
+    </div>
   )
 }

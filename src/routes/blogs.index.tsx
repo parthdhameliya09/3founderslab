@@ -3,16 +3,25 @@ import { useMemo, useState } from "react";
 import { Search, ArrowRight } from "lucide-react";
 import { posts, blogCategories, formatDate } from "@/data/blogs";
 import { PageHero, BlogCard, BlogCover, Reveal } from "@/components/site/ui";
+import { seo, breadcrumbs } from "@/lib/seo";
+import { webPageSchema, itemList } from "@/lib/schema";
 
 export const Route = createFileRoute("/blogs/")({
-  head: () => ({
-    meta: [
-      { title: "Blogs | 3FoundersLab" },
-      { name: "description", content: "Blogs on web development, UI/UX, AI automation, SEO and business growth from 3FoundersLab." },
-      { property: "og:title", content: "Blogs | 3FoundersLab" },
-      { property: "og:description", content: "Thoughts, ideas & digital insights." },
-    ],
-  }),
+  head: () =>
+    seo({
+      title: "Blog: Web Development, SEO, Marketing & AI Insights",
+      description: "Practical articles on web development, e-commerce, SEO, digital marketing and AI automation from the 3FoundersLab team.",
+      path: "/blogs",
+      jsonLd: [
+        webPageSchema("CollectionPage", {
+          path: "/blogs",
+          name: "3FoundersLab Blog",
+          description: "Articles on web development, e-commerce, SEO, digital marketing and AI automation.",
+          extra: { mainEntity: itemList(posts.map((p) => ({ name: p.title, path: `/blogs/${p.slug}` }))) },
+        }),
+        breadcrumbs([{ name: "Blogs", path: "/blogs" }]),
+      ],
+    }),
   component: BlogsPage,
 });
 

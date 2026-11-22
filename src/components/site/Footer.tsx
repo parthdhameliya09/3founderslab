@@ -1,14 +1,24 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Mail, Phone, MapPin } from "lucide-react";
-import { siteConfig, socialLinks } from "@/data/site";
-import logo from "@/assets/logo.png";
+  import { siteConfig, socialLinks } from "@/data/site";
+import logo from "@/assets/logo.webp";
 
 const quick = [
   { to: "/", label: "Home" }, { to: "/services", label: "Services" }, { to: "/work", label: "Work" },
   { to: "/about", label: "About Us" }, { to: "/blogs", label: "Blogs" }, { to: "/contact", label: "Contact" },
 ] as const;
-const serviceLinks = ["Website Development", "E-commerce", "UI/UX Design", "Branding", "AI Automation", "Digital Marketing", "SEO"];
+// Short footer labels; slugs match the section ids on /services.
+const serviceLinks = [
+  { label: "Website Development", slug: "website-development" },
+  { label: "E-commerce", slug: "ecommerce-development" },
+  { label: "UI/UX Design", slug: "ui-ux-design" },
+  { label: "Branding", slug: "branding-logo-design" },
+  { label: "AI Automation", slug: "ai-automation" },
+  { label: "Digital Marketing", slug: "digital-marketing-seo" },
+  { label: "CMS", slug: "cms-website-management" },
+  { label: "MERN Stack", slug: "mern-stack-development" },
+];
 
 function getISTYear(): number {
   return Number(new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Kolkata", year: "numeric" }).format(new Date()));
@@ -47,7 +57,7 @@ export function Footer() {
           {quick.map((l) => <li key={l.to}><Link to={l.to} className="hover:text-foreground">{l.label}</Link></li>)}
         </FooterCol>
         <FooterCol title="Services" className="md:col-span-3">
-          {serviceLinks.map((s) => <li key={s}><Link to="/services" className="hover:text-foreground">{s}</Link></li>)}
+          {serviceLinks.map((s) => <li key={s.slug}><Link to="/services" hash={s.slug} className="hover:text-foreground">{s.label}</Link></li>)}
         </FooterCol>
         <FooterCol title="Connect" className="md:col-span-3">
           {socialLinks.map((s) => <li key={s.name}><a href={s.href} target="_blank" rel="noreferrer" className="hover:text-foreground">{s.name}</a></li>)}

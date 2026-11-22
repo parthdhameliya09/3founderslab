@@ -4,21 +4,23 @@ import { useState } from "react";
 import { services } from "@/data/services";
 import { projects, projectCategories } from "@/data/projects";
 import { posts } from "@/data/blogs";
-import { testimonials } from "@/data/people";
+import { testimonials, team } from "@/data/people";
 import {
   Reveal, SectionHeading, ServiceCard, ProjectCard, BlogCard, TestimonialCard, CtaSection, Marquee,
 } from "@/components/site/ui";
 import { HeroVisual } from "@/components/site/HeroVisual";
+import { seo } from "@/lib/seo";
+import { organizationSchema, websiteSchema, personSchema } from "@/lib/schema";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "3FoundersLab - Building Digital Experiences That Move Businesses Forward" },
-      { name: "description", content: "3FoundersLab builds websites, e-commerce, UI/UX, branding, SEO and AI automation for startups, small businesses and growing brands." },
-      { property: "og:title", content: "3FoundersLab — Digital Experiences That Move Businesses Forward" },
-      { property: "og:description", content: "Websites, design, smart technology and intelligent automation — under one roof." },
-    ],
-  }),
+  head: () =>
+    seo({
+      title: "3FoundersLab | Website Development, UI/UX, SEO & AI Automation",
+      rawTitle: true,
+      description: "3FoundersLab builds websites, e-commerce stores, UI/UX, branding, SEO and AI automation for startups, small businesses and growing brands.",
+      path: "/",
+      jsonLd: [organizationSchema(), websiteSchema(), ...team.map(personSchema)],
+    }),
   component: Home,
 });
 

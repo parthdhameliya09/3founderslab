@@ -2,16 +2,27 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Lightbulb, BadgeCheck, Eye, Sparkles, ShieldCheck, RefreshCw, User, Linkedin } from "lucide-react";
 import { team } from "@/data/people";
 import { PageHero, Reveal, SectionHeading, CtaSection } from "@/components/site/ui";
+import { seo, breadcrumbs } from "@/lib/seo";
+import { organizationSchema, personSchema, webPageSchema, ORG_ID } from "@/lib/schema";
 
 export const Route = createFileRoute("/about")({
-  head: () => ({
-    meta: [
-      { title: "About Us | 3FoundersLab" },
-      { name: "description", content: "3FoundersLab is a technology-focused service company bringing together development, design and innovation." },
-      { property: "og:title", content: "About 3FoundersLab" },
-      { property: "og:description", content: "We are 3FoundersLab. We build with purpose." },
-    ],
-  }),
+  head: () =>
+    seo({
+      title: "About Us: The Team Behind 3FoundersLab",
+      description: "Meet 3FoundersLab, a technology and digital solutions agency bringing together web development, design and AI automation to help businesses grow.",
+      path: "/about",
+      jsonLd: [
+        webPageSchema("AboutPage", {
+          path: "/about",
+          name: "About 3FoundersLab",
+          description: "Meet the three co-founders behind 3FoundersLab and how they work.",
+          extra: { mainEntity: { "@id": ORG_ID } },
+        }),
+        organizationSchema(),
+        ...team.map(personSchema),
+        breadcrumbs([{ name: "About", path: "/about" }]),
+      ],
+    }),
   component: AboutPage,
 });
 

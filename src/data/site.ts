@@ -10,7 +10,6 @@ export const siteConfig = {
 };
 
 export const navLinks = [
-  { to: "/", label: "Home" },
   { to: "/services", label: "Services" },
   { to: "/work", label: "Work" },
   { to: "/about", label: "About" },
@@ -21,6 +20,6 @@ export type SocialLink = { name: string; href: string };
 export const socialLinks: SocialLink[] = [
   { name: "Instagram", href: "https://www.instagram.com/3founderslab" },
   { name: "LinkedIn", href: "https://www.linkedin.com/company/3founderslab" },
-  { name: "Facebook", href: "https://www.facebook.com/profile.php?id=61596404880251" },
+  { name: "Facebook", href: "https://www.facebook.com/share/1cxKbcA9Bw/" },
   { name: "X", href: "https://x.com/3FoundersLab" },
 ];

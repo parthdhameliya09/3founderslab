@@ -10,6 +10,8 @@ export const getRouter = () => {
     routeTree,
     context: { queryClient },
     scrollRestoration: true,
+    // Preload route chunks on hover/touch so navigation doesn't briefly show the old page.
+    defaultPreload: "intent",
     // Lets Query own freshness; set caching defaults on the QueryClient, not the router.
     defaultPreloadStaleTime: 0,
   });

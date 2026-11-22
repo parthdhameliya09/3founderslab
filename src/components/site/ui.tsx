@@ -100,7 +100,20 @@ const coverStyles = [
   "bg-foreground text-background",
   "bg-surface text-foreground",
 ];
-export function BlogCover({ post, className = "" }: { post: Post; className?: string }) {
+export function BlogCover({ post, className = "", eager = false, natural = false }: {
+  post: Post; className?: string; eager?: boolean;
+  /** Show the uploaded image at its own aspect ratio instead of the frame's (used on the article page). */
+  natural?: boolean;
+}) {
+  if (post.cover) {
+    // Covers often contain text, so they are never cropped: "contain" inside fixed card frames.
+    return (
+      <div className={`overflow-hidden bg-brand-soft ${natural ? className.replace(/\baspect-\S+/g, "") : className}`}>
+        <img src={post.cover} alt={post.coverAlt ?? post.title} loading={eager ? "eager" : "lazy"} decoding="async"
+          className={natural ? "block h-auto w-full" : "h-full w-full object-contain"} />
+      </div>
+    );
+  }
   const idx = post.slug.length % coverStyles.length;
   return (
     <div className={`relative flex overflow-hidden ${coverStyles[idx]} ${className}`} aria-hidden>
