@@ -6,6 +6,7 @@ import * as SelectPrimitive from '@radix-ui/react-select'
 import { Check, ChevronDown } from 'lucide-react'
 import { seo, breadcrumbs } from '@/lib/seo'
 import { organizationSchema, webPageSchema, ORG_ID } from '@/lib/schema'
+import { trackEvent } from '@/lib/analytics'
 
 // Google reCAPTCHA v2 ("I'm not a robot"). The site key is public; the secret key lives only in EmailJS.
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY as string | undefined
@@ -267,6 +268,10 @@ function ContactPage() {
         },
       )
       setStatus('success')
+      trackEvent('generate_lead', {
+        service_category: selectedServices.join(', '),
+        budget: budget || 'Not specified',
+      })
       form.reset()
       setBudget('')
       setPreferredContact('Email')

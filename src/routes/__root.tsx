@@ -16,6 +16,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { CustomCursor } from "@/components/site/CustomCursor";
+import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 
 function NotFoundComponent() {
   return (
@@ -128,6 +129,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <GoogleAnalytics />
       <CustomCursor />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:rounded focus:bg-background focus:p-2">Skip to content</a>
